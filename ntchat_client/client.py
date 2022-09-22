@@ -120,7 +120,6 @@ class Client:
             if wx_id == self.self_id and not self.config.report_self:
                 return
             logger.info(f"向ws发送消息：{escape_tag(data)}")
-            data = json.dumps(message)
             self.connect.send(data)
         else:
             logger.info(f"未找到ws链接，无法发送：{escape_tag(data)}...")
