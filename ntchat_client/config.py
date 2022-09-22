@@ -75,7 +75,7 @@ class CustomEnvSettings(EnvSettingsSource):
                 try:
                     if env_val:
                         env_val = settings.__config__.json_loads(env_val.strip())
-                except ValueError as e:
+                except ValueError:
                     logger.trace(
                         f"Error while parsing JSON for {env_name}. Assumed as string."
                     )
@@ -139,6 +139,8 @@ class Config(BaseConfig):
     """密钥"""
     log_level: Union[int, str] = "INFO"
     """默认日志等级"""
+    report_self: bool = False
+    """是否上报自身消息"""
 
     class Config:
         extra = "allow"

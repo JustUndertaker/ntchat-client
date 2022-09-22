@@ -7,6 +7,7 @@ import websocket
 
 from .config import Config
 from .log import logger
+from .model import Response
 
 
 class Client:
@@ -78,8 +79,27 @@ class Client:
     def on_message(self, _: websocket.WebSocketApp, message: str):
         """接受消息"""
         try:
-            msg = json.loads(message)
-            # call_api
+            msg: dict = json.loads(message)
+            logger.debug(f"收到消息：{message}")
+            echo = msg.get("echo")
+            action = msg.get("action")
+            params = msg.get("params")
+            attr = getattr(self.wechat, action, None)
+            if not attr:
+                # 返回方法不存在错误
+                response = Response(echo=echo, status=404, msg="该接口不存在！", data={})
+            else:
+                try:
+                    result: dict = attr(params)
+                    response = Response(
+                        echo=echo, status=200, msg="调用成功", data=result["data"]
+                    )
+                except Exception as e:
+                    response = Response(
+                        echo=echo, status=405, msg=f"调用出错{repr(e)}", data={}
+                    )
+            json_data = json.dumps(response.dict())
+            self.connect.send(json_data)
         except Exception as e:
             logger.debug(f"接收消息出错:{repr(e)}")
 
@@ -93,6 +113,9 @@ class Client:
     def hook_message(self, _: ntchat.WeChat, message: dict):
         """hook消息"""
         if self.is_connected:
+            wx_id = message.get("wx_id")
+            if wx_id == self.self_id and self.config.report_self:
+                return
             logger.info(f"向ws发送消息：{message}")
             data = json.dumps(message)
             self.connect.send(data)
