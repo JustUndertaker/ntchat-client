@@ -8,6 +8,7 @@ import websocket
 from .config import Config
 from .log import logger
 from .model import Response
+from .utils import escape_tag
 
 
 class Client:
@@ -25,6 +26,7 @@ class Client:
 
     def __init__(self, config: Config):
         self.config = config
+        # ntchat.set_wechat_exe_path(wechat_version="3.6.0.18")
         self.wechat = ntchat.WeChat()
         logger.info("正在hook微信...")
         self.wechat.open(smart=self.config.smart)
@@ -79,8 +81,8 @@ class Client:
     def on_message(self, _: websocket.WebSocketApp, message: str):
         """接受消息"""
         try:
+            logger.debug(f"收到消息：{escape_tag(message)}")
             msg: dict = json.loads(message)
-            logger.debug(f"收到消息：{message}")
             echo = msg.get("echo")
             action = msg.get("action")
             params = msg.get("params")
@@ -112,12 +114,13 @@ class Client:
 
     def hook_message(self, _: ntchat.WeChat, message: dict):
         """hook消息"""
+        data = json.dumps(message)
         if self.is_connected:
-            wx_id = message.get("wx_id")
-            if wx_id == self.self_id and self.config.report_self:
+            wx_id = message["data"].get("from_wxid")
+            if wx_id == self.self_id and not self.config.report_self:
                 return
-            logger.info(f"向ws发送消息：{message}")
+            logger.info(f"向ws发送消息：{escape_tag(data)}")
             data = json.dumps(message)
             self.connect.send(data)
         else:
-            logger.info(f"未找到ws链接，无法发送：{message}...")
+            logger.info(f"未找到ws链接，无法发送：{escape_tag(data)}...")
