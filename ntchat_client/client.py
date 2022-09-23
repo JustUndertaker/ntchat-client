@@ -23,27 +23,48 @@ class Client:
     """是否已连接"""
     self_id: str
     """微信id"""
+    msg_fiter = {
+        ntchat.MT_USER_LOGIN_MSG,
+        ntchat.MT_USER_LOGOUT_MSG,
+        ntchat.MT_RECV_WECHAT_QUIT_MSG,
+    }
+    """消息过滤列表"""
 
     def __init__(self, config: Config):
         self.config = config
-        # ntchat.set_wechat_exe_path(wechat_version="3.6.0.18")
+        self.msg_fiter |= config.msg_filter
+        print(self.msg_fiter)
+        ntchat.set_wechat_exe_path(wechat_version="3.6.0.18")
+
+    def init(self):
+        """
+        初始化
+        """
         self.wechat = ntchat.WeChat()
         logger.info("正在hook微信...")
         self.wechat.open(smart=self.config.smart)
+        self.wechat.on(ntchat.MT_USER_LOGIN_MSG, self.login)
+        self.wechat.on(ntchat.MT_USER_LOGOUT_MSG, self.logout)
 
-    def init(self):
-        """初始化"""
-        count = 0
-        while not self.wechat.login_status:
-            count += 1
-            if count > 100:
-                raise RuntimeError("hook微信失败！")
-            time.sleep(1)
+    def login(self, _: ntchat.WeChat, message: dict):
+        """
+        登入hook
+        """
         logger.info("hook微信成功！")
-        message = self.wechat.get_self_info()
-        self.self_id = message["wxid"]
+        self.self_id = message["data"]["wxid"]
         self.wechat.on(ntchat.MT_ALL, self.hook_message)
         self.connect_ws()
+
+    def logout(self, _: ntchat.WeChat, message: dict):
+        """
+        登出hook
+        """
+        logger.error("检测到微信登出，正在想办法重启...")
+        self.connect.close()
+        ntchat.exit_()
+        self.wechat = ntchat.WeChat()
+        time.sleep(3)
+        self.init()
 
     def connect_ws(self):
         """链接服务器"""
@@ -108,12 +129,16 @@ class Client:
     def on_close(self, _: websocket.WebSocketApp, code: int, msg: str):
         """关闭连接"""
         self.is_connected = False
-        if code:
+        if code and code != 1000:
             logger.debug(f"ws关闭code:{code}，msg:{msg}")
             self.connect_ws()
 
     def hook_message(self, _: ntchat.WeChat, message: dict):
         """hook消息"""
+        # 过滤事件
+        msgtype = message["type"]
+        if msgtype in self.msg_fiter:
+            return
         data = json.dumps(message)
         if self.is_connected:
             wx_id = message["data"].get("from_wxid")

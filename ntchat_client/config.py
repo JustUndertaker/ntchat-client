@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Mapping, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Mapping, Optional, Set, Tuple, Union
 
 from pydantic import BaseSettings
 from pydantic.env_settings import (
@@ -139,6 +139,8 @@ class Config(BaseConfig):
     """密钥"""
     log_level: Union[int, str] = "INFO"
     """默认日志等级"""
+    msg_filter: Set[int] = {}
+    """事件过滤列表"""
     report_self: bool = False
     """是否上报自身消息"""
 
