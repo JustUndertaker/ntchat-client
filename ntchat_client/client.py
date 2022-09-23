@@ -27,6 +27,7 @@ class Client:
         ntchat.MT_USER_LOGIN_MSG,
         ntchat.MT_USER_LOGOUT_MSG,
         ntchat.MT_RECV_WECHAT_QUIT_MSG,
+        ntchat.MT_RECV_LOGIN_QRCODE_MSG,
     }
     """消息过滤列表"""
 
@@ -45,6 +46,26 @@ class Client:
         self.wechat.open(smart=self.config.smart)
         self.wechat.on(ntchat.MT_USER_LOGIN_MSG, self.login)
         self.wechat.on(ntchat.MT_USER_LOGOUT_MSG, self.logout)
+        self.wechat.on(ntchat.MT_RECV_WECHAT_QUIT_MSG, self.quit)
+        if not self.config.smart:
+            self.wechat.on(ntchat.MT_RECV_LOGIN_QRCODE_MSG, self.login_qrcode)
+
+    def login_qrcode(self, _: ntchat.WeChat, message: dict):
+        """
+        登录二维码
+        """
+        # 将二维码显示在终端
+        pass
+
+    def quit(self, _: ntchat.WeChat, message: dict):
+        """
+        微信退出
+        """
+        logger.error("检测到微信退出，终止程序...")
+        if self.is_connected:
+            self.connect.close()
+        ntchat.exit_()
+        sys.exit()
 
     def login(self, _: ntchat.WeChat, message: dict):
         """
