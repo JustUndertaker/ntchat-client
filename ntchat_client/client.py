@@ -132,26 +132,19 @@ class Client:
             if not attr:
                 # 返回方法不存在错误
                 logger.error(f"接口不存在：{action}")
-                response = Response(echo=echo, status=404, msg="该接口不存在！", data={})
+                response = Response(
+                    echo=echo, status="failed", msg=f"调用出错，不存在接口：{action}！", data={}
+                )
             else:
                 try:
                     logger.debug(f"调用接口：{action}，参数：{params}")
                     result = attr(**params)
-                    if isinstance(result, bool):
-                        response = Response(echo=echo, status=200, msg="调用成功", data="")
-                    elif isinstance(result, dict):
-                        response = Response(
-                            echo=echo, status=200, msg="调用成功", data=result
-                        )
-                    elif isinstance(result, list):
-                        response = Response(
-                            echo=echo, status=200, msg="调用成功", data=result
-                        )
-                    else:
-                        response = Response(echo=echo, status=200, msg="调用成功", data="")
+                    response = Response(
+                        echo=echo, status="success", msg="调用成功", data=result
+                    )
                 except Exception as e:
                     response = Response(
-                        echo=echo, status=405, msg=f"调用出错{repr(e)}", data={}
+                        echo=echo, status="failed", msg=f"调用出错：{repr(e)}", data={}
                     )
             json_data = json.dumps(response.dict(), ensure_ascii=False)
             logger.info(f"返回结果：{escape_tag(json_data)}")
