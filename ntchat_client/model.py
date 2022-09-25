@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import BaseModel
 
 
@@ -6,9 +8,9 @@ class Response(BaseModel):
 
     echo: str
     """echo值"""
-    status: int
-    """状态码"""
+    status: str
+    """状态值"""
     msg: str
     """回复消息"""
-    data: dict
+    data: Any
     """返回数据"""
