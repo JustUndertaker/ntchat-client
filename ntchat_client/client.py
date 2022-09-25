@@ -34,7 +34,6 @@ class Client:
     def __init__(self, config: Config):
         self.config = config
         self.msg_fiter |= config.msg_filter
-        print(self.msg_fiter)
         ntchat.set_wechat_exe_path(wechat_version="3.6.0.18")
 
     def init(self):
@@ -48,6 +47,7 @@ class Client:
         self.wechat.on(ntchat.MT_USER_LOGOUT_MSG, self.logout)
         self.wechat.on(ntchat.MT_RECV_WECHAT_QUIT_MSG, self.quit)
         if not self.config.smart:
+            logger.info("未开启smart，正在注入登录事件...")
             self.wechat.on(ntchat.MT_RECV_LOGIN_QRCODE_MSG, self.login_qrcode)
 
     def login_qrcode(self, _: ntchat.WeChat, message: dict):
@@ -131,18 +131,30 @@ class Client:
             attr = getattr(self.wechat, action, None)
             if not attr:
                 # 返回方法不存在错误
+                logger.error(f"接口不存在：{action}")
                 response = Response(echo=echo, status=404, msg="该接口不存在！", data={})
             else:
                 try:
-                    result: dict = attr(params)
-                    response = Response(
-                        echo=echo, status=200, msg="调用成功", data=result["data"]
-                    )
+                    logger.debug(f"调用接口：{action}，参数：{params}")
+                    result = attr(**params)
+                    if isinstance(result, bool):
+                        response = Response(echo=echo, status=200, msg="调用成功", data="")
+                    elif isinstance(result, dict):
+                        response = Response(
+                            echo=echo, status=200, msg="调用成功", data=result
+                        )
+                    elif isinstance(result, list):
+                        response = Response(
+                            echo=echo, status=200, msg="调用成功", data=result
+                        )
+                    else:
+                        response = Response(echo=echo, status=200, msg="调用成功", data="")
                 except Exception as e:
                     response = Response(
                         echo=echo, status=405, msg=f"调用出错{repr(e)}", data={}
                     )
-            json_data = json.dumps(response.dict())
+            json_data = json.dumps(response.dict(), ensure_ascii=False)
+            logger.info(f"返回结果：{escape_tag(json_data)}")
             self.connect.send(json_data)
         except Exception as e:
             logger.debug(f"接收消息出错:{repr(e)}")
@@ -160,7 +172,7 @@ class Client:
         msgtype = message["type"]
         if msgtype in self.msg_fiter:
             return
-        data = json.dumps(message)
+        data = json.dumps(message, ensure_ascii=False)
         if self.is_connected:
             wx_id = message["data"].get("from_wxid")
             if wx_id == self.self_id and not self.config.report_self:
