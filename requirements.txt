@@ -1,0 +1,12 @@
+certifi==2022.9.24
+colorama==0.4.5
+loguru==0.6.0
+ntchat==0.1.16
+pydantic==1.10.2
+pyee==9.0.4
+python-dotenv==0.21.0
+typing_extensions==4.4.0
+websocket-client==1.4.1
+win32-setctime==1.1.0
+wincertstore==0.2
+xcgui==0.1.6
