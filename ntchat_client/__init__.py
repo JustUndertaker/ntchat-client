@@ -1,10 +1,11 @@
 import sys
 import time
 
+import ntchat
+
 from ntchat_client.client import Client
 from ntchat_client.config import Config, Env
 from ntchat_client.log import default_filter, logger
-
 
 _manager: Client = None
 """全局管理器"""
@@ -26,4 +27,5 @@ def init():
             try:
                 time.sleep(0.1)
             except KeyboardInterrupt:
+                ntchat.exit_()
                 sys.exit()
