@@ -76,7 +76,7 @@ def scheduler_job(config: Config):
         count += 1
         file_info = file.stat()
         file_time = datetime.fromtimestamp(file_info.st_ctime)
-        if file_time + days > now:
+        if now > file_time + days:
             file.unlink()
             delete_count += 1
     logger.debug(f"共有缓存文件 {count} 个，清理 {delete_count} 个...")
