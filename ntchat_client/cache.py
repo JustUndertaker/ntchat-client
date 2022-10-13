@@ -1,11 +1,13 @@
 """
 缓存处理
 """
+import base64
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
 from httpx import Client
+from yarl import URL
 
 from .config import Config
 from .log import logger
@@ -33,7 +35,7 @@ class FileCache:
             f.write(file)
 
     def get(self, url: str) -> bytes:
-        """请求获取图片"""
+        """请求获取url文件"""
         res = self._client.get(url)
         return res.content
 
@@ -44,9 +46,26 @@ class FileCache:
         self._save(file, path)
         return path
 
+    def handle_file(self, file: str, file_path: str) -> str:
+        """处理文件url"""
+        file_type = URL(file)
+        match file_type:
+            case "file":
+                return str(Path(file).absolute())
+            case "base64":
+                filename = Path(file_path) / self.get_seq()
+                file_value = base64.standard_b64decode(file[9:])
+                self._save(file_value, filename)
+                return str(filename.absolute())
+            case "http" | "https":
+                filename = Path(file_path) / self.get_seq()
+                file_value = self.get(file)
+                self._save(file_value, filename)
+                return str(filename.absolute())
+
 
 def scheduler_job(config: Config):
-    """定时工作"""
+    """定时清理"""
     logger.info("开始清理文件缓存...")
     path = Path(config.cache_path)
     days = timedelta(days=config.cache_days)

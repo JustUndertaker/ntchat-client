@@ -5,6 +5,7 @@ import time
 import ntchat
 import websocket
 
+from .cache import FileCache
 from .config import Config
 from .log import logger
 from .model import Response
@@ -22,6 +23,7 @@ class Client:
     """配置"""
     is_connected: bool = False
     """是否已连接"""
+    file_cache: FileCache
     self_id: str
     """微信id"""
     msg_fiter = {
@@ -34,6 +36,7 @@ class Client:
 
     def __init__(self, config: Config):
         self.config = config
+        self.file_cache = FileCache()
         self.msg_fiter |= config.msg_filter
         ntchat.set_wechat_exe_path(wechat_version="3.6.0.18")
 
@@ -122,6 +125,21 @@ class Client:
         """链接出错"""
         logger.error(repr(err))
 
+    def _pre_handle_api(self, action: str, params: dict) -> dict:
+        """
+        参数预处理，用于缓存文件操作
+        """
+        match action:
+            case "send_image" | "send_file" | "send_video":
+                file: str = params.get("file_path")
+                params["file_path"] = self.file_cache.handle_file(file)
+            case "send_gif":
+                file: str = params.get("file")
+                params["file"] = self.file_cache.handle_file(file)
+            case _:
+                pass
+        return params
+
     def _handle_api(self, msg: dict) -> Response:
         """
         处理api调用
@@ -129,6 +147,12 @@ class Client:
         echo = msg.get("echo")
         action = msg.get("action")
         params = msg.get("params")
+        try:
+            params = self._pre_handle_api(action, params)
+        except Exception as e:
+            logger.error(f"处理参数出错：{repr(e)}...")
+            return Response(echo=echo, status=500, msg=f"处理参数出错：{repr(e)}", data={})
+
         attr = getattr(self.wechat, action, None)
         if not attr:
             # 返回方法不存在错误
