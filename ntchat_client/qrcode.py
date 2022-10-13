@@ -21,7 +21,7 @@ def draw_qrcode(url: str, version=1):
             * `5`：Large大小
     """
     qr = qrcode.QRCode(version)
-    qr.add_data(str)
+    qr.add_data(url)
     qr.make()
     output = white_block * (qr.modules_count + 2) + new_line
     for mn in qr.modules:
