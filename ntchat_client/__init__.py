@@ -31,9 +31,9 @@ def init():
         scheduler = BlockingScheduler()
         job = partial(scheduler_job, config)
         scheduler.add_job(func=job, trigger="cron", hour=0, minute=0)
+        logger.debug("定时器启动成功...")
         try:
             scheduler.start()
-            logger.debug("定时器启动成功...")
         except (KeyboardInterrupt, SystemExit):
             scheduler.shutdown()
             ntchat.exit_()
