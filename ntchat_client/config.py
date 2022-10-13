@@ -143,6 +143,10 @@ class Config(BaseConfig):
     """事件过滤列表"""
     report_self: bool = False
     """是否上报自身消息"""
+    cache_path: str = "./file_cache"
+    """文件缓存目录"""
+    cache_days: int = 3
+    """文件缓存天数"""
 
     class Config:
         extra = "allow"

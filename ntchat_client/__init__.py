@@ -1,8 +1,11 @@
 import sys
-import time
+from functools import partial
+from pathlib import Path
 
 import ntchat
+from apscheduler.schedulers.background import BackgroundScheduler
 
+from ntchat_client.cache import scheduler_job
 from ntchat_client.client import Client
 from ntchat_client.config import Config, Env
 from ntchat_client.log import default_filter, logger
@@ -21,11 +24,17 @@ def init():
         logger.info(f"Current <y><b>Env: {env.environment}</b></y>")
         logger.debug(f"Loaded <y><b>Config</b></y>: {str(config.dict())}")
         logger.info("初始化ntchat_client...")
+        Path(config.cache_path).mkdir(parents=True, exist_ok=True)
         _manager = Client(config)
         _manager.init()
-        while True:
-            try:
-                time.sleep(0.1)
-            except (KeyboardInterrupt, SystemExit):
-                ntchat.exit_()
-                sys.exit()
+        logger.debug("初始化定时器...")
+        scheduler = BackgroundScheduler()
+        job = partial(scheduler_job, config)
+        scheduler.add_job(func=job, trigger="cron", hour=0, minute=0)
+        try:
+            scheduler.start()
+            logger.debug("定时器启动成功...")
+        except (KeyboardInterrupt, SystemExit):
+            scheduler.shutdown()
+            ntchat.exit_()
+            sys.exit()
