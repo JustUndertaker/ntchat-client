@@ -3,7 +3,7 @@ from functools import partial
 from pathlib import Path
 
 import ntchat
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 from ntchat_client.cache import scheduler_job
 from ntchat_client.client import Client
@@ -28,7 +28,7 @@ def init():
         _manager = Client(config)
         _manager.init()
         logger.debug("初始化定时器...")
-        scheduler = BackgroundScheduler()
+        scheduler = BlockingScheduler()
         job = partial(scheduler_job, config)
         scheduler.add_job(func=job, trigger="cron", hour=0, minute=0)
         try:
