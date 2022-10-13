@@ -40,5 +40,22 @@ msg_filter = []
 
 # 是否上报自身消息
 report_self = False
+
+# 文件缓存地址
+cache_path = "./file_cache"
+
+# 文件缓存天数
+cache_days = 3
 ```
 
+## 更新日志
+
+#### 0.2.0
+
+- 增加二维码扫描
+- 增加文件缓存模块，拓展ntchat自身api中的file支持类型（支持filepath,url,base64）
+- 增加定时模块用于处理文件缓存
+- api调用file及file_path字段需要修改，目前支持：
+  - 绝对路径，采用file_uri：file:///path
+  - 网络路径，支持http和https，格式：http://或https://
+  - base64，格式为：base64://values
