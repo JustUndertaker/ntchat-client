@@ -8,6 +8,7 @@ import websocket
 from .config import Config
 from .log import logger
 from .model import Response
+from .qrcode import draw_qrcode
 from .utils import escape_tag
 
 
@@ -55,7 +56,9 @@ class Client:
         登录二维码
         """
         # 将二维码显示在终端
-        pass
+        url = message["data"]["code"]
+        logger.info("检测到登录二维码...")
+        draw_qrcode(url)
 
     def quit(self, _: ntchat.WeChat, message: dict):
         """
@@ -118,7 +121,7 @@ class Client:
 
     def on_error(self, _: websocket.WebSocketApp, err):
         """链接出错"""
-        logger.error(str(err))
+        logger.error(repr(err))
 
     def on_message(self, _: websocket.WebSocketApp, message: str):
         """接受消息"""
