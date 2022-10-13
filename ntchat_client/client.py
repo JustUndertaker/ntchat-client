@@ -122,44 +122,47 @@ class Client:
         """链接出错"""
         logger.error(repr(err))
 
+    def _handle_api(self, msg: dict) -> Response:
+        """
+        处理api调用
+        """
+        echo = msg.get("echo")
+        action = msg.get("action")
+        params = msg.get("params")
+        attr = getattr(self.wechat, action, None)
+        if not attr:
+            # 返回方法不存在错误
+            logger.error(f"接口不存在：{action}")
+            response = Response(echo=echo, status=404, msg="该接口不存在！", data={})
+        else:
+            try:
+                logger.debug(f"调用接口：{action}，参数：{params}")
+                result = attr(**params)
+                if isinstance(result, bool):
+                    response = Response(echo=echo, status=200, msg="调用成功", data="")
+                elif isinstance(result, dict):
+                    response = Response(echo=echo, status=200, msg="调用成功", data=result)
+                elif isinstance(result, list):
+                    response = Response(echo=echo, status=200, msg="调用成功", data=result)
+                else:
+                    response = Response(echo=echo, status=200, msg="调用成功", data="")
+            except Exception as e:
+                response = Response(
+                    echo=echo, status=405, msg=f"调用出错{repr(e)}", data={}
+                )
+        return response
+
     def on_message(self, _: websocket.WebSocketApp, message: str):
         """接受消息"""
         try:
             logger.debug(f"收到消息：{escape_tag(message)}")
             msg: dict = json.loads(message)
-            echo = msg.get("echo")
-            action = msg.get("action")
-            params = msg.get("params")
-            attr = getattr(self.wechat, action, None)
-            if not attr:
-                # 返回方法不存在错误
-                logger.error(f"接口不存在：{action}")
-                response = Response(echo=echo, status=404, msg="该接口不存在！", data={})
-            else:
-                try:
-                    logger.debug(f"调用接口：{action}，参数：{params}")
-                    result = attr(**params)
-                    if isinstance(result, bool):
-                        response = Response(echo=echo, status=200, msg="调用成功", data="")
-                    elif isinstance(result, dict):
-                        response = Response(
-                            echo=echo, status=200, msg="调用成功", data=result
-                        )
-                    elif isinstance(result, list):
-                        response = Response(
-                            echo=echo, status=200, msg="调用成功", data=result
-                        )
-                    else:
-                        response = Response(echo=echo, status=200, msg="调用成功", data="")
-                except Exception as e:
-                    response = Response(
-                        echo=echo, status=405, msg=f"调用出错{repr(e)}", data={}
-                    )
+            response = self._handle_api(msg)
             json_data = json.dumps(response.dict(), ensure_ascii=False)
             logger.info(f"返回结果：{escape_tag(json_data)}")
             self.connect.send(json_data)
         except Exception as e:
-            logger.debug(f"接收消息出错:{repr(e)}")
+            logger.error(f"接收消息出错:{repr(e)}")
 
     def on_close(self, _: websocket.WebSocketApp, code: int, msg: str):
         """关闭连接"""
