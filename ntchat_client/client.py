@@ -60,15 +60,14 @@ class Client:
         logger.info("检测到登录二维码...")
         draw_qrcode(url)
 
-    def quit(self, _: ntchat.WeChat, message: dict):
+    def quit(self, _: ntchat.WeChat):
         """
         微信退出
         """
         logger.error("检测到微信退出，终止程序...")
         if self.is_connected:
             self.connect.close()
-        ntchat.exit_()
-        sys.exit()
+        raise SystemExit()
 
     def login(self, _: ntchat.WeChat, message: dict):
         """

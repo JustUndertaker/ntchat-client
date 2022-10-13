@@ -26,6 +26,6 @@ def init():
         while True:
             try:
                 time.sleep(0.1)
-            except KeyboardInterrupt:
+            except (KeyboardInterrupt, SystemExit):
                 ntchat.exit_()
                 sys.exit()
