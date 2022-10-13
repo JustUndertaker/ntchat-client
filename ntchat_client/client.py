@@ -50,9 +50,7 @@ class Client:
         self.wechat.on(ntchat.MT_USER_LOGIN_MSG, self.login)
         self.wechat.on(ntchat.MT_USER_LOGOUT_MSG, self.logout)
         self.wechat.on(ntchat.MT_RECV_WECHAT_QUIT_MSG, self.quit)
-        if not self.config.smart:
-            logger.info("未开启smart，正在注入登录事件...")
-            self.wechat.on(ntchat.MT_RECV_LOGIN_QRCODE_MSG, self.login_qrcode)
+        self.wechat.on(ntchat.MT_RECV_LOGIN_QRCODE_MSG, self.login_qrcode)
 
     def login_qrcode(self, _: ntchat.WeChat, message: dict):
         """
