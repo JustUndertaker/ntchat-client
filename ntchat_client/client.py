@@ -130,10 +130,14 @@ class Client:
         match action:
             case "send_image" | "send_file" | "send_video":
                 file: str = params.get("file_path")
-                params["file_path"] = self.file_cache.handle_file(file)
+                params["file_path"] = self.file_cache.handle_file(
+                    file, self.config.cache_path
+                )
             case "send_gif":
                 file: str = params.get("file")
-                params["file"] = self.file_cache.handle_file(file)
+                params["file"] = self.file_cache.handle_file(
+                    file, self.config.cache_path
+                )
             case _:
                 pass
         return params

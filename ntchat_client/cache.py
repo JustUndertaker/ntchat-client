@@ -5,6 +5,7 @@ import base64
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
+from urllib.parse import unquote
 
 from httpx import Client
 from yarl import URL
@@ -49,9 +50,9 @@ class FileCache:
     def handle_file(self, file: str, file_path: str) -> str:
         """处理文件url"""
         file_type = URL(file)
-        match file_type:
+        match file_type.scheme:
             case "file":
-                return str(Path(file).absolute())
+                return str(Path(unquote(file)).absolute())
             case "base64":
                 filename = Path(file_path) / self.get_seq()
                 file_value = base64.standard_b64decode(file[9:])
