@@ -1,5 +1,6 @@
 import logging
 import sys
+from pathlib import Path
 from typing import Union
 
 from loguru._logger import Core, Logger
@@ -69,3 +70,62 @@ logger_id = logger.add(
     filter=default_filter,
     format=default_format,
 )
+
+
+def log_init(log_days: int):
+    """日志初始化"""
+    Path("./logs/info").mkdir(parents=True, exist_ok=True)
+    Path("./logs/debug").mkdir(parents=True, exist_ok=True)
+    Path("./logs/error").mkdir(parents=True, exist_ok=True)
+    # 日志文件记录格式
+    file_format = (
+        "<g>{time:MM-DD HH:mm:ss}</g> "
+        "[<lvl>{level}</lvl>] "
+        "<c><u>{name}</u></c> | "
+        "{message}"
+    )
+
+    # 错误日志文件记录格式
+    error_format = (
+        "<g>{time:MM-DD HH:mm:ss}</g> "
+        "[<lvl>{level}</lvl>] "
+        "[<c><u>{name}</u></c>] | "
+        "<c>{function}:{line}</c>| "
+        "{message}"
+    )
+
+    # info文件
+    info_path = "./logs/info/"
+    logger.add(
+        info_path + "{time:YYYY-MM-DD}.log",
+        rotation="00:00",
+        retention=f"{log_days} days",
+        level="INFO",
+        format=file_format,
+        filter=default_filter,
+        encoding="utf-8",
+    )
+
+    # debug文件
+    debug_path = "./logs/debug/"
+    logger.add(
+        debug_path + "{time:YYYY-MM-DD}.log",
+        rotation="00:00",
+        retention=f"{log_days} days",
+        level="DEBUG",
+        format=file_format,
+        filter=default_filter,
+        encoding="utf-8",
+    )
+
+    # error文件
+    error_path = "./logs/error/"
+    logger.add(
+        error_path + "{time:YYYY-MM-DD}.log",
+        rotation="00:00",
+        retention=f"{log_days} days",
+        level="ERROR",
+        format=error_format,
+        filter=default_filter,
+        encoding="utf-8",
+    )

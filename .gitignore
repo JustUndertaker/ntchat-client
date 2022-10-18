@@ -129,3 +129,4 @@ dmypy.json
 .vscode/
 *.code-workspace
 file_cache/
+logs/

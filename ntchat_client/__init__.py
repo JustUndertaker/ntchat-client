@@ -8,7 +8,7 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from ntchat_client.cache import scheduler_job
 from ntchat_client.client import Client
 from ntchat_client.config import Config, Env
-from ntchat_client.log import default_filter, logger
+from ntchat_client.log import default_filter, log_init, logger
 
 
 def tick():
@@ -21,6 +21,7 @@ def init():
     env = Env()
     config = Config(_common_config=env.dict())
     default_filter.level = config.log_level
+    log_init(config.log_days)
     logger.info(f"Current <y><b>Env: {env.environment}</b></y>")
     logger.debug(f"Loaded <y><b>Config</b></y>: {str(config.dict())}")
     logger.info("初始化ntchat_client...")

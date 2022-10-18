@@ -139,6 +139,8 @@ class Config(BaseConfig):
     """密钥"""
     log_level: Union[int, str] = "INFO"
     """默认日志等级"""
+    log_days: int = 10
+    """日志保存天数"""
     msg_filter: Set[int] = {}
     """事件过滤列表"""
     report_self: bool = False
