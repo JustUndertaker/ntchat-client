@@ -1,7 +1,7 @@
 <h1 align="center">NtChat-Client</h1>
 
 <p align="center">
-	<a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.1.0-blue.svg?" alt="release"></a>   
+	<a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.1.0-blue.svg?" alt="release"></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?" alt="License"></a>
 </p>
 
@@ -35,6 +35,9 @@ access_token = ""
 # 日志显示等级
 log_level = "DEBUG"
 
+# 日志保存天数
+log_days = 10
+
 # 事件过滤列表，列表填tpye的数字
 msg_filter = []
 
@@ -53,6 +56,7 @@ cache_days = 3
 #### 0.2.0
 
 - 增加二维码扫描
+- 增加日志保存
 - 增加文件缓存模块，拓展ntchat自身api中的file支持类型（支持filepath,url,base64）
 - 增加定时模块用于处理文件缓存
 - api调用file及file_path字段需要修改，目前支持：
