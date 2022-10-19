@@ -1,3 +1,5 @@
+"""日志模块
+"""
 import logging
 import sys
 from pathlib import Path
@@ -72,7 +74,7 @@ logger_id = logger.add(
 )
 
 
-def log_init(log_days: int):
+def log_init(log_days: int) -> None:
     """日志初始化"""
     Path("./logs/info").mkdir(parents=True, exist_ok=True)
     Path("./logs/debug").mkdir(parents=True, exist_ok=True)

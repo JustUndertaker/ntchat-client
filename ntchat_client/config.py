@@ -1,8 +1,11 @@
+"""配置模块
+"""
 import os
+from ipaddress import IPv4Address
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Mapping, Optional, Set, Tuple, Union
 
-from pydantic import BaseSettings
+from pydantic import BaseSettings, IPvAnyAddress
 from pydantic.env_settings import (
     EnvSettingsSource,
     InitSettingsSource,
@@ -133,8 +136,14 @@ class Config(BaseConfig):
     _env_file: str = ".env"
     smart: bool = True
     """是否注入当前wechat"""
-    ws_address: str = "ws://127.0.0.1:8080/ntchat/ws"
-    """ws地址"""
+    host: IPvAnyAddress = IPv4Address("127.0.0.1")
+    """http服务地址"""
+    port: int = 8080
+    """http服务端口"""
+    http_post_url: str = ""
+    """http post上报地址，如果不填则不上报"""
+    ws_address: str = ""
+    """反向ws连接地址，如果不填则不会连接ws"""
     access_token: str = ""
     """密钥"""
     log_level: Union[int, str] = "INFO"

@@ -1,4 +1,10 @@
+"""工具函数
+"""
 import re
+from threading import Condition
+
+notify = Condition()
+"""全局通知"""
 
 
 def escape_tag(s: str) -> str:

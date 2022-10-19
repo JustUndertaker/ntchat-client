@@ -5,12 +5,12 @@ import time
 import ntchat
 import websocket
 
-from .cache import FileCache
 from .config import Config
 from .log import logger
 from .model import Response
-from .qrcode import draw_qrcode
 from .utils import escape_tag
+from .wechat.cache import FileCache
+from .wechat.qrcode import draw_qrcode
 
 
 class Client:

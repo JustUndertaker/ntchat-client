@@ -10,20 +10,27 @@ from urllib.parse import unquote
 from httpx import Client
 from yarl import URL
 
-from .config import Config
-from .log import logger
+from ntchat_client.config import Config
+from ntchat_client.log import logger
 
 
 class FileCache:
     """文件缓存"""
 
-    def __init__(self) -> None:
+    def __new__(cls, *args, **kwargs):
+        """单例"""
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self, cache_path: str) -> None:
         self._seq: int = 1
         self._client = Client(
             headers={
                 "User-Agent": "Mozilla/5.0(X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0"
             }
         )
+        Path(cache_path).mkdir(parents=True, exist_ok=True)
 
     def get_seq(self) -> str:
         s = self._seq
@@ -40,10 +47,10 @@ class FileCache:
         res = self._client.get(url)
         return res.content
 
-    def save_file(self, chache_path: Path, file: bytes) -> Path:
+    def save_file(self, cache_path: Path, file: bytes) -> Path:
         """储存文件，返回路径"""
         seq = self.get_seq()
-        path = chache_path / seq
+        path = cache_path / seq
         self._save(file, path)
         return path
 
