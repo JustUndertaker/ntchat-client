@@ -168,7 +168,9 @@ class WeChatManager:
             return Response(status=404, msg="请求接口不存在！", data={})
         else:
             try:
-                logger.debug(f"<m>wechat</m> - 调用接口：{request.action}，参数：{params}")
+                logger.debug(
+                    f"<m>wechat</m> - <g>调用接口：</g>{request.action}，参数：{params}"
+                )
                 result = attr(**params)
                 if isinstance(result, bool):
                     response = Response(status=200, msg="调用成功", data={})
