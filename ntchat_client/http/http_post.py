@@ -42,7 +42,7 @@ class PostManager:
             return
 
         try:
-            logger.debug(f"向http_post上报消息：{data}")
+            logger.debug(f"<g>向http_post上报消息：</g>{data}")
             await self.client.post(url=self.url, data=data)
         except Exception as e:
-            logger.error(f"http_post上报消息出错：{repr(e)}")
+            logger.error(f"http_post上报消息出错：<r>{repr(e)}</r>")

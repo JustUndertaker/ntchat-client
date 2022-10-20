@@ -95,7 +95,7 @@ class WsManager:
             self.ws_client = None
 
         except ConnectionClosedError as e:
-            logger.error(f"<r>ws链接异常关闭：{e.reason}</r>")
+            logger.error(f"ws链接异常关闭：<r>{e.reason}</r>")
             # 自启动
             self.ws_client = None
             await self.connect()
@@ -106,5 +106,3 @@ class WsManager:
             data = json.dumps(message, ensure_ascii=False)
             logger.debug(f"<g>向ws发送消息：</g>{escape_tag(data)}")
             await self.ws_client.send(data)
-        else:
-            logger.debug("未连接到ws，不发送...")

@@ -1,12 +1,19 @@
 import asyncio
 from asyncio import AbstractEventLoop
-from typing import Any, Callable, NoReturn, Optional
+from typing import Any, Callable, NoReturn, Optional, overload
 
 import ntchat
 
 from ntchat_client.config import Config
 from ntchat_client.log import logger
-from ntchat_client.model import WsRequest, WsResponse
+from ntchat_client.model import (
+    HttpRequest,
+    HttpResponse,
+    Request,
+    Response,
+    WsRequest,
+    WsResponse,
+)
 from ntchat_client.utils import escape_tag, notify
 
 from .cache import FileCache
@@ -146,13 +153,13 @@ class WeChatManager:
                 pass
         return params
 
-    def handle_api(self, request: WsRequest) -> WsResponse:
+    def _handle_api(self, request: Request) -> Response:
         """处理api调用"""
         try:
             params = self._pre_handle_api(request.action, request.params)
         except Exception as e:
             logger.error(f"处理参数出错：{repr(e)}...")
-            return WsResponse(
+            return Response(
                 echo=request.echo, status=500, msg=f"处理参数出错：{repr(e)}", data={}
             )
 
@@ -160,32 +167,41 @@ class WeChatManager:
         if not attr:
             # 返回方法不存在错误
             logger.error(f"接口不存在：{request.action}")
-            return WsResponse(echo=request.echo, status=404, msg="请求接口不存在！", data={})
+            return Response(status=404, msg="请求接口不存在！", data={})
         else:
             try:
                 logger.debug(f"调用接口：{request.action}，参数：{params}")
                 result = attr(**params)
                 if isinstance(result, bool):
-                    response = WsResponse(
-                        echo=request.echo, status=200, msg="调用成功", data={}
-                    )
+                    response = Response(status=200, msg="调用成功", data={})
                 elif isinstance(result, dict):
-                    response = WsResponse(
-                        echo=request.echo, status=200, msg="调用成功", data=result
-                    )
+                    response = Response(status=200, msg="调用成功", data=result)
                 elif isinstance(result, list):
-                    response = WsResponse(
-                        echo=request.echo, status=200, msg="调用成功", data=result
-                    )
+                    response = Response(status=200, msg="调用成功", data=result)
                 else:
-                    response = WsResponse(
-                        echo=request.echo, status=200, msg="调用成功", data=""
-                    )
+                    response = Response(status=200, msg="调用成功", data="")
             except Exception as e:
-                response = WsResponse(
-                    echo=request.echo, status=405, msg=f"调用出错{repr(e)}", data={}
-                )
+                response = Response(status=405, msg=f"调用出错{repr(e)}", data={})
         return response
+
+    @overload
+    def handle_api(self, request: HttpRequest) -> HttpResponse:
+        """处理api调用"""
+        request = Request(action=request.action, params=request.params)
+        response = self._handle_api(request)
+        return HttpResponse(
+            status=response.status, msg=response.msg, data=response.data
+        )
+
+    @overload
+    def handle_api(self, request: WsRequest) -> WsRequest:
+        """处理api调用"""
+        echo = request.echo
+        request = Request(action=request.action, params=request.params)
+        response = self._handle_api(request)
+        return WsResponse(
+            echo=echo, status=response.status, msg=response.msg, data=response.data
+        )
 
     def on_message(self, _: ntchat.WeChat, message: dict) -> None:
         """接收消息"""
