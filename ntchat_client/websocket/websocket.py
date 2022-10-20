@@ -26,7 +26,8 @@ async def websocket_init(config: Config) -> None:
     ws_manager.message_handler = wechat_client.handle_api
     wechat_client.ws_message_handler = ws_manager.send_message
     logger.success("<g>websocket管理器初始化完成...</g>")
-    asyncio.create_task(ws_manager.connect())
+    if config.ws_address != "":
+        asyncio.create_task(ws_manager.connect())
 
 
 async def websocket_shutdown() -> None:
