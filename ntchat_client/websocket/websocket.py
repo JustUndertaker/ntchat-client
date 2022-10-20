@@ -111,7 +111,7 @@ class WsManager:
         """发送ws消息"""
         if not self.closed:
             data = json.dumps(message, ensure_ascii=False)
-            logger.info(f"向ws发送消息：{escape_tag(data)}")
+            logger.debug(f"向ws发送消息：{escape_tag(data)}")
             await self.ws_client.send(data)
         else:
             logger.debug("未连接到ws，无法发送...")

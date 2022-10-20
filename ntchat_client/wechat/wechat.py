@@ -193,6 +193,7 @@ class WeChatManager:
         msgtype = message["type"]
         if msgtype in self.msg_fiter:
             return
+        logger.success(f"收到wechat消息：{message}")
         if self.ws_message_handler:
             asyncio.run_coroutine_threadsafe(
                 self.ws_message_handler(message), self.loop
