@@ -48,7 +48,7 @@ default_format: str = (
 
 
 class LoguruHandler(logging.Handler):  # pragma: no cover
-    def emit(self, record):
+    def emit(self, record) -> None:
         try:
             level = logger.level(record.levelname).name
         except ValueError:

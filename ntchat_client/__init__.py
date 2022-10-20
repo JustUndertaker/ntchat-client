@@ -10,7 +10,7 @@ from ntchat_client.websocket import websocket_init, websocket_shutdown
 from ntchat_client.wechat import get_wechat_client, wechat_init, wechat_shutdown
 
 _Driver: Driver = None
-"""全局后端"""
+"""全局驱动器"""
 
 
 def init() -> None:
@@ -26,9 +26,10 @@ def init() -> None:
     # 登录微信
     wechat_init(config)
     wait_for_login()
-    # 添加api
+
     _Driver = Driver(config)
     app = _Driver.server_app
+    # 添加api
     app.include_router(router)
     # 添加定时清理任务
     _Driver.on_startup(partial(scheduler_init, config))
