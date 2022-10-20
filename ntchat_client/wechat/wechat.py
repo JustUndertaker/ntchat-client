@@ -116,7 +116,8 @@ class WeChatManager:
         """
         登出hook
         """
-        logger.error("<m>wechat</m> - 检测到微信登出...")
+        logger.error("<m>wechat</m> - 检测到微信登出，终止程序...")
+        raise SystemExit()
 
     def quit(self, _: ntchat.WeChat) -> NoReturn:
         """
@@ -208,7 +209,7 @@ class WeChatManager:
         if msgtype in self.msg_fiter:
             return
         logger.success(f"<m>wechat</m> - <g>收到wechat消息：</g>{escape_tag(str(message))}")
-        if self.loop.is_running:
+        if self.loop and self.loop.is_running:
             if self.ws_message_handler:
                 asyncio.run_coroutine_threadsafe(
                     self.ws_message_handler(message), self.loop
