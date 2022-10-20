@@ -138,7 +138,7 @@ class Config(BaseConfig):
     """是否注入当前wechat"""
     host: IPvAnyAddress = IPv4Address("127.0.0.1")
     """http服务地址"""
-    port: int = 8080
+    port: int = 8000
     """http服务端口"""
     http_post_url: str = ""
     """http post上报地址，如果不填则不上报"""

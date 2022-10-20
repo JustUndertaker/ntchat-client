@@ -2,7 +2,7 @@
 """
 from fastapi import APIRouter
 
-from ntchat_client.wechat import wechat_client
+from ntchat_client.wechat import get_wechat_client
 
 router = APIRouter()
 

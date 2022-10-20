@@ -2,12 +2,17 @@ from functools import partial
 
 from ntchat_client.config import Config, Env
 from ntchat_client.driver import Driver
-from ntchat_client.http import router
+from ntchat_client.http import post_init, router
 from ntchat_client.log import default_filter, log_init, logger
 from ntchat_client.scheduler import scheduler_init, scheduler_shutdown
 from ntchat_client.utils import notify
 from ntchat_client.websocket import websocket_init, websocket_shutdown
-from ntchat_client.wechat import get_wechat_client, wechat_init, wechat_shutdown
+from ntchat_client.wechat import (
+    get_wechat_client,
+    send_event_loop,
+    wechat_init,
+    wechat_shutdown,
+)
 
 _Driver: Driver = None
 """全局驱动器"""
@@ -31,10 +36,14 @@ def init() -> None:
     app = _Driver.server_app
     # 添加api
     app.include_router(router)
+    # 添加事件循环
+    _Driver.on_startup(send_event_loop)
     # 添加定时清理任务
     _Driver.on_startup(partial(scheduler_init, config))
     # 添加websocket连接任务
     _Driver.on_startup(partial(websocket_init, config))
+    # 添加http_post任务
+    _Driver.on_startup(partial(post_init, config))
     # 添加关闭任务
     _Driver.on_shutdown(scheduler_shutdown)
     _Driver.on_shutdown(websocket_shutdown)

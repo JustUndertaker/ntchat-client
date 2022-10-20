@@ -37,7 +37,7 @@ class FileCache:
         self._seq = (self._seq + 1) % sys.maxsize
         return f"{str(s)}.file"
 
-    def _save(self, file: bytes, path: Path):
+    def _save(self, file: bytes, path: Path) -> None:
         """储存文件"""
         with open(path, mode="wb") as f:
             f.write(file)
@@ -72,7 +72,7 @@ class FileCache:
                 return str(filename.absolute())
 
 
-def scheduler_job(config: Config):
+def scheduler_job(config: Config) -> None:
     """定时清理"""
     logger.info("开始清理文件缓存...")
     path = Path(config.cache_path)

@@ -1,9 +1,12 @@
-from typing import NoReturn
+import asyncio
+from asyncio import AbstractEventLoop
+from typing import Any, Callable, NoReturn, Optional
 
 import ntchat
 
 from ntchat_client.config import Config
 from ntchat_client.log import logger
+from ntchat_client.model import WsRequest, WsResponse
 from ntchat_client.utils import notify
 
 from .cache import FileCache
@@ -13,10 +16,10 @@ wechat_client: "WeChatManager" = None
 """全局微信客户端"""
 
 
-def get_wechat_client() -> "WeChatManager":
+def get_wechat_client() -> Optional["WeChatManager"]:
     """获取微信客户端"""
     if wechat_client is None:
-        raise RuntimeError("客户端不存在！")
+        return None
     return wechat_client
 
 
@@ -27,21 +30,36 @@ def wechat_init(config: Config) -> None:
     wechat_client.init()
 
 
+def send_event_loop() -> None:
+    """绑定事件循环"""
+    global wechat_client
+    loop = asyncio.get_running_loop()
+    wechat_client.loop = loop
+
+
 def wechat_shutdown() -> None:
     """关闭微信模块"""
     if wechat_client:
         logger.info("正在关闭微信注入...")
         ntchat.exit_()
-        logger.info("微信注入已关闭...")
+        logger.success("微信注入已关闭...")
 
 
 class WeChatManager:
     """微信封装类"""
 
+    config: Config
+    """配置"""
     client: ntchat.WeChat
     """客户端"""
     self_id: str
     """自身id"""
+    loop: AbstractEventLoop = None
+    """事件循环"""
+    ws_message_handler: Callable[..., Any] = None
+    """ws消息处理器"""
+    http_post_handler: Callable[..., Any] = None
+    """http_post处理器"""
     file_cache: FileCache
     """文件缓存管理器"""
     msg_fiter = {
@@ -81,8 +99,9 @@ class WeChatManager:
         登入hook
         """
         notify.acquire()
-        logger.info("hook微信成功！")
+        logger.success("hook微信成功！")
         self.self_id = message["data"]["wxid"]
+        self.wechat.on(ntchat.MT_ALL, self.on_message)
         notify.notify_all()
         notify.release()
 
@@ -107,3 +126,76 @@ class WeChatManager:
         url = message["data"]["code"]
         logger.info("检测到登录二维码...")
         draw_qrcode(url)
+
+    def _pre_handle_api(self, action: str, params: dict) -> dict:
+        """
+        参数预处理，用于缓存文件操作
+        """
+        match action:
+            case "send_image" | "send_file" | "send_video":
+                file: str = params.get("file_path")
+                params["file_path"] = self.file_cache.handle_file(
+                    file, self.config.cache_path
+                )
+            case "send_gif":
+                file: str = params.get("file")
+                params["file"] = self.file_cache.handle_file(
+                    file, self.config.cache_path
+                )
+            case _:
+                pass
+        return params
+
+    def handle_api(self, request: WsRequest) -> WsResponse:
+        """处理api调用"""
+        try:
+            params = self._pre_handle_api(request.action, request.params)
+        except Exception as e:
+            logger.error(f"处理参数出错：{repr(e)}...")
+            return WsResponse(
+                echo=request.echo, status=500, msg=f"处理参数出错：{repr(e)}", data={}
+            )
+
+        attr = getattr(self.wechat, request.action, None)
+        if not attr:
+            # 返回方法不存在错误
+            logger.error(f"接口不存在：{request.action}")
+            return WsResponse(echo=request.echo, status=404, msg="请求接口不存在！", data={})
+        else:
+            try:
+                logger.debug(f"调用接口：{request.action}，参数：{params}")
+                result = attr(**params)
+                if isinstance(result, bool):
+                    response = WsResponse(
+                        echo=request.echo, status=200, msg="调用成功", data={}
+                    )
+                elif isinstance(result, dict):
+                    response = WsResponse(
+                        echo=request.echo, status=200, msg="调用成功", data=result
+                    )
+                elif isinstance(result, list):
+                    response = WsResponse(
+                        echo=request.echo, status=200, msg="调用成功", data=result
+                    )
+                else:
+                    response = WsResponse(
+                        echo=request.echo, status=200, msg="调用成功", data=""
+                    )
+            except Exception as e:
+                response = WsResponse(
+                    echo=request.echo, status=405, msg=f"调用出错{repr(e)}", data={}
+                )
+        return response
+
+    def on_message(self, _: ntchat.WeChat, message: dict) -> None:
+        """接收消息"""
+        # 过滤事件
+        msgtype = message["type"]
+        if msgtype in self.msg_fiter:
+            return
+        if self.ws_message_handler:
+            asyncio.run_coroutine_threadsafe(
+                self.ws_message_handler(message), self.loop
+            )
+        if self.http_post_handler:
+            asyncio.run_coroutine_threadsafe(self.http_post_handler(message), self.loop)
