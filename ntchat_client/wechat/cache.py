@@ -74,7 +74,7 @@ class FileCache:
 
 def scheduler_job(config: Config) -> None:
     """定时清理"""
-    logger.info("开始清理文件缓存...")
+    logger.info("<m>wechat</m> - 开始清理文件缓存...")
     path = Path(config.cache_path)
     days = timedelta(days=config.cache_days)
     now = datetime.now()
@@ -87,5 +87,5 @@ def scheduler_job(config: Config) -> None:
         if now > file_time + days:
             file.unlink()
             delete_count += 1
-    logger.debug(f"共有缓存文件 {count} 个，清理 {delete_count} 个...")
-    logger.info("缓存文件清理完毕...")
+    logger.debug(f"<m>wechat</m> - 共有缓存文件 {count} 个，清理 {delete_count} 个...")
+    logger.info("<m>wechat</m> - 缓存文件清理完毕...")

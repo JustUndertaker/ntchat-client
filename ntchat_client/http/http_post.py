@@ -18,7 +18,7 @@ def post_init(config: Config) -> None:
     self_id = wechat_client.self_id
     post_manager = PostManager(self_id, config)
     wechat_client.http_post_handler = post_manager.post_respone
-    logger.success("<g>http_post初始化完成...</g>")
+    logger.success("<m>http_post</m> - <g>http_post初始化完成...</g>")
 
 
 class PostManager:
@@ -42,8 +42,10 @@ class PostManager:
             return
 
         try:
-            logger.debug(f"<e>向http_post上报消息：</e>{data}")
+            logger.debug(f"<m>http_post</m> - <e>向http_post上报消息：</e>{data}")
             response = await self.client.post(url=self.url, data=data)
-            logger.debug(f"<e>向http_post上报结果：</e>{response.status_code}")
+            logger.debug(
+                f"<m>http_post</m> - <e>向http_post上报结果：</e>{response.status_code}"
+            )
         except Exception as e:
-            logger.error(f"http_post上报消息出错：<r>{str(e)}</r>")
+            logger.error(f"<m>http_post</m> - http_post上报消息出错：<r>{str(e)}</r>")

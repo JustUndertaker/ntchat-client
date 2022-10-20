@@ -19,13 +19,13 @@ ws_manager: "WsManager"
 async def websocket_init(config: Config) -> None:
     """初始化ws连接"""
     global ws_manager
-    logger.info("正在初始化websocket管理器...")
+    logger.info("<m>websocket</m> - 正在初始化websocket管理器...")
     wechat_client = get_wechat_client()
     self_id = wechat_client.self_id
     ws_manager = WsManager(self_id, config)
     ws_manager.message_handler = wechat_client.handle_ws_api
     wechat_client.ws_message_handler = ws_manager.send_message
-    logger.success("<g>websocket管理器初始化完成...</g>")
+    logger.success("<m>websocket</m> - <g>websocket管理器初始化完成...</g>")
     if config.ws_address != "":
         asyncio.create_task(ws_manager.connect())
 
@@ -64,7 +64,7 @@ class WsManager:
         """连接ws服务"""
         while True:
             try:
-                logger.info(f"正在连接到：<g>{self.ws_adress}</g>")
+                logger.info(f"<m>websocket</m> - 正在连接到：<g>{self.ws_adress}</g>")
                 self.ws_client = await websockets.connect(
                     uri=self.ws_adress,
                     extra_headers=self.headers,
@@ -73,10 +73,10 @@ class WsManager:
                     close_timeout=10,
                 )
                 asyncio.create_task(self._task())
-                logger.success("<g>ws已成功连接！</g>")
+                logger.success("<m>websocket</m> - <g>ws已成功连接！</g>")
                 return
             except Exception as e:
-                logger.error(f"连接到ws地址发生错误：<r>{str(e)}</r>")
+                logger.error(f"<m>websocket</m> - 连接到ws地址发生错误：<r>{str(e)}</r>")
                 await asyncio.sleep(2)
 
     async def _task(self) -> None:
@@ -87,7 +87,7 @@ class WsManager:
                 log_msg = escape_tag(msg)
                 if len(log_msg) > 100:
                     log_msg = log_msg[:100]
-                logger.success(f"<g>收到ws消息：</g>{log_msg}")
+                logger.success(f"<m>websocket</m> - <g>收到ws消息：</g>{log_msg}")
                 msg = json.loads(msg)
                 msg = WsRequest.parse_obj(msg)
                 if self.message_handler:
@@ -95,11 +95,11 @@ class WsManager:
                     asyncio.create_task(self.send_message(data.dict()))
 
         except ConnectionClosedOK:
-            logger.success("<g>ws链接已主动关闭...</g>")
+            logger.success("<m>websocket</m> - <g>ws链接已主动关闭...</g>")
             self.ws_client = None
 
         except ConnectionClosedError as e:
-            logger.error(f"ws链接异常关闭：<r>{e.reason}</r>")
+            logger.error(f"<m>websocket</m> - ws链接异常关闭：<r>{e.reason}</r>")
             # 自启动
             self.ws_client = None
             await self.connect()
@@ -108,5 +108,5 @@ class WsManager:
         """发送ws消息"""
         if not self.closed:
             data = json.dumps(message, ensure_ascii=False)
-            logger.debug(f"<e>向ws发送消息：</e>{escape_tag(data)}")
+            logger.debug(f"<m>websocket</m> - <e>向ws发送消息：</e>{escape_tag(data)}")
             await self.ws_client.send(data)

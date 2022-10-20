@@ -47,9 +47,9 @@ def send_event_loop() -> None:
 def wechat_shutdown() -> None:
     """关闭微信模块"""
     if wechat_client:
-        logger.info("正在关闭微信注入...")
+        logger.info("<m>wechat</m> - 正在关闭微信注入...")
         ntchat.exit_()
-        logger.success("<g>微信注入已关闭...</g>")
+        logger.success("<m>wechat</m> - <g>微信注入已关闭...</g>")
 
 
 class WeChatManager:
@@ -94,7 +94,7 @@ class WeChatManager:
     def init(self) -> None:
         """初始化"""
         self.wechat = ntchat.WeChat()
-        logger.info("正在hook微信...")
+        logger.info("<m>wechat</m> - 正在hook微信...")
         self.wechat.open(smart=self.config.smart)
         self.wechat.on(ntchat.MT_USER_LOGIN_MSG, self.login)
         self.wechat.on(ntchat.MT_USER_LOGOUT_MSG, self.logout)
@@ -106,7 +106,7 @@ class WeChatManager:
         登入hook
         """
         notify.acquire()
-        logger.success("<g>hook微信成功！</g>")
+        logger.success("<m>wechat</m> - <g>hook微信成功！</g>")
         self.self_id = message["data"]["wxid"]
         self.wechat.on(ntchat.MT_ALL, self.on_message)
         notify.notify_all()
@@ -116,13 +116,13 @@ class WeChatManager:
         """
         登出hook
         """
-        logger.error("检测到微信登出...")
+        logger.error("<m>wechat</m> - 检测到微信登出...")
 
     def quit(self, _: ntchat.WeChat) -> NoReturn:
         """
         微信退出
         """
-        logger.error("检测到微信退出，终止程序...")
+        logger.error("<m>wechat</m> - 检测到微信退出，终止程序...")
         raise SystemExit()
 
     def login_qrcode(self, _: ntchat.WeChat, message: dict) -> None:
@@ -131,7 +131,7 @@ class WeChatManager:
         """
         # 将二维码显示在终端
         url = message["data"]["code"]
-        logger.info("检测到登录二维码...")
+        logger.info("<m>wechat</m> - 检测到登录二维码...")
         draw_qrcode(url)
 
     def _pre_handle_api(self, action: str, params: dict) -> dict:
@@ -158,17 +158,17 @@ class WeChatManager:
         try:
             params = self._pre_handle_api(request.action, request.params)
         except Exception as e:
-            logger.error(f"处理参数出错：{repr(e)}...")
+            logger.error(f"<m>wechat</m> - 处理参数出错：{repr(e)}...")
             return Response(status=500, msg=f"处理参数出错：{repr(e)}", data={})
 
         attr = getattr(self.wechat, request.action, None)
         if not attr:
             # 返回方法不存在错误
-            logger.error(f"接口不存在：{request.action}")
+            logger.error(f"<m>wechat</m> - 接口不存在：{request.action}")
             return Response(status=404, msg="请求接口不存在！", data={})
         else:
             try:
-                logger.debug(f"调用接口：{request.action}，参数：{params}")
+                logger.debug(f"<m>wechat</m> - 调用接口：{request.action}，参数：{params}")
                 result = attr(**params)
                 if isinstance(result, bool):
                     response = Response(status=200, msg="调用成功", data={})
@@ -205,7 +205,7 @@ class WeChatManager:
         msgtype = message["type"]
         if msgtype in self.msg_fiter:
             return
-        logger.success(f"<g>收到wechat消息：</g>{escape_tag(str(message))}")
+        logger.success(f"<m>wechat</m> - <g>收到wechat消息：</g>{escape_tag(str(message))}")
         if self.ws_message_handler:
             asyncio.run_coroutine_threadsafe(
                 self.ws_message_handler(message), self.loop

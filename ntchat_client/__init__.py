@@ -36,6 +36,7 @@ def init() -> None:
     app = _Driver.server_app
     # 添加api
     app.include_router(router)
+    logger.success("<g>http api已开启...</g>")
     # 添加事件循环
     _Driver.on_startup(send_event_loop)
     # 添加定时清理任务
