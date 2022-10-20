@@ -206,9 +206,12 @@ class WeChatManager:
         if msgtype in self.msg_fiter:
             return
         logger.success(f"<m>wechat</m> - <g>收到wechat消息：</g>{escape_tag(str(message))}")
-        if self.ws_message_handler:
-            asyncio.run_coroutine_threadsafe(
-                self.ws_message_handler(message), self.loop
-            )
-        if self.http_post_handler:
-            asyncio.run_coroutine_threadsafe(self.http_post_handler(message), self.loop)
+        if self.loop.is_running:
+            if self.ws_message_handler:
+                asyncio.run_coroutine_threadsafe(
+                    self.ws_message_handler(message), self.loop
+                )
+            if self.http_post_handler:
+                asyncio.run_coroutine_threadsafe(
+                    self.http_post_handler(message), self.loop
+                )
