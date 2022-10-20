@@ -23,7 +23,7 @@ async def websocket_init(config: Config) -> None:
     wechat_client = get_wechat_client()
     self_id = wechat_client.self_id
     ws_manager = WsManager(self_id, config)
-    ws_manager.message_handler = wechat_client.handle_api
+    ws_manager.message_handler = wechat_client.handle_ws_api
     wechat_client.ws_message_handler = ws_manager.send_message
     logger.success("<g>websocket管理器初始化完成...</g>")
     if config.ws_address != "":
@@ -84,7 +84,10 @@ class WsManager:
         try:
             while True:
                 msg = await self.ws_client.recv()
-                logger.success(f"<g>收到ws消息：<g>{msg}")
+                log_msg = escape_tag(msg)
+                if len(log_msg) > 100:
+                    log_msg = log_msg[:100]
+                logger.success(f"<g>收到ws消息：</g>{log_msg}")
                 msg = json.loads(msg)
                 msg = WsRequest.parse_obj(msg)
                 if self.message_handler:
@@ -105,5 +108,5 @@ class WsManager:
         """发送ws消息"""
         if not self.closed:
             data = json.dumps(message, ensure_ascii=False)
-            logger.debug(f"<g>向ws发送消息：</g>{escape_tag(data)}")
+            logger.debug(f"<e>向ws发送消息：</e>{escape_tag(data)}")
             await self.ws_client.send(data)

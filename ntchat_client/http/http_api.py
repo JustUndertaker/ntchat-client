@@ -14,7 +14,7 @@ async def _(action: str, params: HttpParams, response: Response) -> None:
     # 构造请求体
     http_request = HttpRequest(action=action, params=params.dict())
     wechat_client = get_wechat_client()
-    res = wechat_client.handle_api(http_request)
+    res = wechat_client.handle_http_api(http_request)
     self_id = wechat_client.self_id
     access_token = wechat_client.config.access_token
     response.headers["X-self-ID"] = self_id

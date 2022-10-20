@@ -1,6 +1,6 @@
 import asyncio
 from asyncio import AbstractEventLoop
-from typing import Any, Callable, NoReturn, Optional, overload
+from typing import Any, Callable, NoReturn, Optional
 
 import ntchat
 
@@ -184,18 +184,16 @@ class WeChatManager:
                 response = Response(status=405, msg=f"调用出错{repr(e)}", data={})
         return response
 
-    @overload
-    def handle_api(self, request: HttpRequest) -> HttpResponse:
-        """处理api调用"""
+    def handle_http_api(self, request: HttpRequest) -> HttpResponse:
+        """处理http的api调用"""
         request = Request(action=request.action, params=request.params)
         response = self._handle_api(request)
         return HttpResponse(
             status=response.status, msg=response.msg, data=response.data
         )
 
-    @overload
-    def handle_api(self, request: WsRequest) -> WsRequest:
-        """处理api调用"""
+    def handle_ws_api(self, request: WsRequest) -> WsRequest:
+        """处理ws的api调用"""
         echo = request.echo
         request = Request(action=request.action, params=request.params)
         response = self._handle_api(request)
