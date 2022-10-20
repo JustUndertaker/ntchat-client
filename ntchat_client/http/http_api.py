@@ -24,10 +24,8 @@ async def _(action: str, response: Response, params=Body(None)) -> None:
         return HttpResponse(status=405, msg="请求参数不正确！", data={})
     wechat_client = get_wechat_client()
     res = wechat_client.handle_http_api(http_request)
-    self_id = wechat_client.self_id
-    access_token = wechat_client.config.access_token
-    response.headers["X-self-ID"] = self_id
-    response.headers["access_token"] = access_token
+    response.headers["X-self-ID"] = wechat_client.self_id
+    response.headers["access_token"] = wechat_client.config.access_token
     logger.info(f"<m>http_api</m> - <g>调用返回：</g>{res.dict()}")
 
     return res
