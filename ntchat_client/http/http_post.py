@@ -18,7 +18,7 @@ def post_init(config: Config) -> None:
     self_id = wechat_client.self_id
     post_manager = PostManager(self_id, config)
     wechat_client.http_post_handler = post_manager.post_respone
-    logger.success("http_post初始化完成...")
+    logger.success("<g>http_post初始化完成...</g>")
 
 
 class PostManager:

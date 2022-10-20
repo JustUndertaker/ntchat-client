@@ -7,7 +7,7 @@ import ntchat
 from ntchat_client.config import Config
 from ntchat_client.log import logger
 from ntchat_client.model import WsRequest, WsResponse
-from ntchat_client.utils import notify
+from ntchat_client.utils import escape_tag, notify
 
 from .cache import FileCache
 from .qrcode import draw_qrcode
@@ -42,7 +42,7 @@ def wechat_shutdown() -> None:
     if wechat_client:
         logger.info("正在关闭微信注入...")
         ntchat.exit_()
-        logger.success("微信注入已关闭...")
+        logger.success("<g>微信注入已关闭...</g>")
 
 
 class WeChatManager:
@@ -99,7 +99,7 @@ class WeChatManager:
         登入hook
         """
         notify.acquire()
-        logger.success("hook微信成功！")
+        logger.success("<g>hook微信成功！</g>")
         self.self_id = message["data"]["wxid"]
         self.wechat.on(ntchat.MT_ALL, self.on_message)
         notify.notify_all()
@@ -193,7 +193,7 @@ class WeChatManager:
         msgtype = message["type"]
         if msgtype in self.msg_fiter:
             return
-        logger.success(f"收到wechat消息：{message}")
+        logger.success(f"<g>收到wechat消息：</g>{escape_tag(str(message))}")
         if self.ws_message_handler:
             asyncio.run_coroutine_threadsafe(
                 self.ws_message_handler(message), self.loop

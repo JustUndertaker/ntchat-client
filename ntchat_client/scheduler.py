@@ -20,7 +20,7 @@ def scheduler_init(config: Config) -> None:
         scheduler.add_job(
             partial(scheduler_job, config), trigger="cron", hour=0, minute=0
         )
-        logger.info("<g>定时器模块已开启...</g>")
+        logger.success("<g>定时器模块已开启...</g>")
 
 
 def scheduler_shutdown() -> None:
@@ -28,4 +28,4 @@ def scheduler_shutdown() -> None:
     logger.info("正在关闭定时器...")
     if scheduler.running:
         scheduler.shutdown(wait=False)
-    logger.info("定时器关闭成功...")
+    logger.success("<g>定时器关闭成功...</g>")

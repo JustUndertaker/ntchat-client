@@ -25,7 +25,7 @@ async def websocket_init(config: Config) -> None:
     ws_manager = WsManager(self_id, config)
     ws_manager.message_handler = wechat_client.handle_api
     wechat_client.ws_message_handler = ws_manager.send_message
-    logger.success("websocket管理器初始化完成...")
+    logger.success("<g>websocket管理器初始化完成...</g>")
     asyncio.create_task(ws_manager.connect())
 
 
@@ -63,7 +63,7 @@ class WsManager:
         """连接ws服务"""
         while True:
             try:
-                logger.info(f"正在连接到：{self.ws_adress}")
+                logger.info(f"正在连接到：<g>{self.ws_adress}</g>")
                 self.ws_client = await websockets.connect(
                     uri=self.ws_adress,
                     extra_headers=self.headers,
@@ -71,26 +71,19 @@ class WsManager:
                     ping_timeout=20,
                     close_timeout=10,
                 )
-                self.create_hook()
                 asyncio.create_task(self._task())
-                logger.info("ws已成功连接！")
+                logger.success("<g>ws已成功连接！</g>")
                 return
             except Exception as e:
-                logger.error(f"连接到ws地址发生错误：{str(e)}")
+                logger.error(f"连接到ws地址发生错误：<r>{str(e)}</r>")
                 await asyncio.sleep(2)
-
-    def create_hook(self) -> None:
-        """创建监听hook"""
-        wechat_client = get_wechat_client()
-        if wechat_client is None:
-            logger.error("未检测到微信客户端...")
-            raise SystemError()
 
     async def _task(self) -> None:
         """循环等待接收任务"""
         try:
             while True:
                 msg = await self.ws_client.recv()
+                logger.success(f"<g>收到ws消息：<g>{msg}")
                 msg = json.loads(msg)
                 msg = WsRequest.parse_obj(msg)
                 if self.message_handler:
@@ -98,11 +91,11 @@ class WsManager:
                     asyncio.create_task(self.send_message(data.dict()))
 
         except ConnectionClosedOK:
-            logger.debug("<g>ws链接已主动关闭...</g>")
+            logger.success("<g>ws链接已主动关闭...</g>")
             self.ws_client = None
 
         except ConnectionClosedError as e:
-            logger.error(f"ws链接异常关闭：{e.reason}")
+            logger.error(f"<r>ws链接异常关闭：{e.reason}</r>")
             # 自启动
             self.ws_client = None
             await self.connect()
@@ -111,7 +104,7 @@ class WsManager:
         """发送ws消息"""
         if not self.closed:
             data = json.dumps(message, ensure_ascii=False)
-            logger.debug(f"向ws发送消息：{escape_tag(data)}")
+            logger.debug(f"<g>向ws发送消息：</g>{escape_tag(data)}")
             await self.ws_client.send(data)
         else:
-            logger.debug("未连接到ws，无法发送...")
+            logger.debug("未连接到ws，不发送...")
