@@ -159,9 +159,7 @@ class WeChatManager:
             params = self._pre_handle_api(request.action, request.params)
         except Exception as e:
             logger.error(f"处理参数出错：{repr(e)}...")
-            return Response(
-                echo=request.echo, status=500, msg=f"处理参数出错：{repr(e)}", data={}
-            )
+            return Response(status=500, msg=f"处理参数出错：{repr(e)}", data={})
 
         attr = getattr(self.wechat, request.action, None)
         if not attr:

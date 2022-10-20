@@ -1,13 +1,6 @@
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel
-
-
-class HttpParams(BaseModel):
-    """http post 请求体"""
-
-    class Config:
-        extra = "allow"
 
 
 class Request(BaseModel):
@@ -15,7 +8,7 @@ class Request(BaseModel):
 
     action: str
     """请求方法"""
-    params: dict
+    params: Optional[dict]
     """请求参数"""
 
 
@@ -35,7 +28,7 @@ class WsRequest(Request):
 class Response(BaseModel):
     """api 响应基类"""
 
-    status: str
+    status: int
     """状态值"""
     msg: str
     """回复消息"""
