@@ -83,7 +83,7 @@ ws_address = "127.0.0.1:8080/ntchat/ws"
 
 ```dotenv
 # http post上报地址，不填不会进行上报
-http_post_url = "127.0.0.1:8080/http"
+http_post_url = "127.0.0.1:8080/ntchat/http"
 ```
 
 - 这里127.0.0.1与nb2的host配置对应
@@ -214,6 +214,18 @@ api地址：/get_room_detail
 | *room_wxid* |   str    | 必填 |  None  | 群房间id |
 
 响应数据类型：dict
+
+### 获取群名
+
+api地址：/get_room_name
+
+参数：
+
+|   字段名    | 数据类型 | 可选 | 默认值 |  说明  |
+| :---------: | :------: | :--: | :----: | :----: |
+| *room_wxid* |   str    | 必填 |  None  | 房间号 |
+
+响应数据类型：str
 
 ### 获取群成员列表
 
@@ -525,14 +537,3 @@ api地址：/modify_friend_remark
 
 响应数据类型：None
 
-### 获取群名
-
-api地址：/get_room_name
-
-参数：
-
-|   字段名    | 数据类型 | 可选 | 默认值 |  说明  |
-| :---------: | :------: | :--: | :----: | :----: |
-| *room_wxid* |   str    | 必填 |  None  | 房间号 |
-
-响应数据类型：str
