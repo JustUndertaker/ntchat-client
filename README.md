@@ -83,7 +83,7 @@ ws_address = "127.0.0.1:8080/ntchat/ws"
 
 ```dotenv
 # http post上报地址，不填不会进行上报
-http_post_url = "127.0.0.1:8080/ntchat/http"
+http_post_url = "http://127.0.0.1:8080/ntchat/http"
 ```
 
 - 这里127.0.0.1与nb2的host配置对应
@@ -123,7 +123,7 @@ http_post_url = "127.0.0.1:8080/ntchat/http"
 在连接到wechat后，会自动开启http api，访问http api需要注意：
 
 - 当前api只支持post方法，get无法访问
-- post访问请将参数放入body，编码规则使用JSON， Content-Type设置为JSON
+- post访问请将参数放入body，编码规则使用JSON， Content-Type设置为application/json
 
 ### 响应数据模型
 
