@@ -178,14 +178,15 @@ class WeChatManager:
                     result = attr()
                 else:
                     result = attr(**params)
-                if isinstance(result, bool):
-                    response = Response(status=200, msg="调用成功", data={})
-                elif isinstance(result, dict):
-                    response = Response(status=200, msg="调用成功", data=result)
-                elif isinstance(result, list):
+                if (
+                    isinstance(result, bool)
+                    or isinstance(result, dict)
+                    or isinstance(result, list)
+                    or isinstance(result, str)
+                ):
                     response = Response(status=200, msg="调用成功", data=result)
                 else:
-                    response = Response(status=200, msg="调用成功", data="")
+                    response = Response(status=200, msg="调用成功，但没有返回结果", data={})
             except Exception as e:
                 response = Response(status=405, msg=f"调用出错{str(e)}", data={})
         return response
