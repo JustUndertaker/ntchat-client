@@ -135,10 +135,12 @@ class WeChatManager:
         logger.info("<m>wechat</m> - 检测到登录二维码...")
         draw_qrcode(url)
 
-    def _pre_handle_api(self, action: str, params: dict) -> dict:
+    def _pre_handle_api(self, action: str, params: Optional[dict] = None) -> dict:
         """
         参数预处理，用于缓存文件操作
         """
+        if params is None:
+            return
         match action:
             case "send_image" | "send_file" | "send_video":
                 file: str = params.get("file_path")
@@ -159,8 +161,8 @@ class WeChatManager:
         try:
             params = self._pre_handle_api(request.action, request.params)
         except Exception as e:
-            logger.error(f"<m>wechat</m> - 处理参数出错：{repr(e)}...")
-            return Response(status=500, msg=f"处理参数出错：{repr(e)}", data={})
+            logger.error(f"<m>wechat</m> - 处理参数出错：{str(e)}...")
+            return Response(status=500, msg=f"处理参数出错：{str(e)}", data={})
 
         attr = getattr(self.wechat, request.action, None)
         if not attr:
@@ -172,7 +174,10 @@ class WeChatManager:
                 logger.debug(
                     f"<m>wechat</m> - <g>调用接口：</g>{request.action}，参数：{params}"
                 )
-                result = attr(**params)
+                if params is None:
+                    result = attr()
+                else:
+                    result = attr(**params)
                 if isinstance(result, bool):
                     response = Response(status=200, msg="调用成功", data={})
                 elif isinstance(result, dict):
@@ -182,7 +187,7 @@ class WeChatManager:
                 else:
                     response = Response(status=200, msg="调用成功", data="")
             except Exception as e:
-                response = Response(status=405, msg=f"调用出错{repr(e)}", data={})
+                response = Response(status=405, msg=f"调用出错{str(e)}", data={})
         return response
 
     def handle_http_api(self, request: HttpRequest) -> HttpResponse:
