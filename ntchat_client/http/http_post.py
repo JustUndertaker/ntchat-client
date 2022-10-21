@@ -30,7 +30,11 @@ class PostManager:
     """post地址"""
 
     def __init__(self, self_id: str, config: Config) -> None:
-        headers = {"X-Self-ID": self_id, "access_token": config.access_token}
+        headers = {
+            "X-Self-ID": self_id,
+            "access_token": config.access_token,
+            "Content-Type": "application/json",
+        }
         self.client = AsyncClient(headers=headers)
         self.url = config.http_post_url
 
@@ -43,7 +47,7 @@ class PostManager:
 
         try:
             logger.debug(f"<m>http_post</m> - <e>向http_post上报消息：</e>{data}")
-            response = await self.client.post(url=self.url, data=data)
+            response = await self.client.post(url=self.url, json=data)
             logger.debug(
                 f"<m>http_post</m> - <e>向http_post上报结果：</e>{response.status_code}"
             )

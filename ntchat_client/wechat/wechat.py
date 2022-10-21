@@ -186,7 +186,7 @@ class WeChatManager:
                 ):
                     response = Response(status=200, msg="调用成功", data=result)
                 else:
-                    response = Response(status=200, msg="调用成功，但没有返回结果", data={})
+                    response = Response(status=204, msg="调用成功，但没有返回结果", data={})
             except Exception as e:
                 response = Response(status=405, msg=f"调用出错{str(e)}", data={})
         return response
@@ -215,12 +215,13 @@ class WeChatManager:
         if msgtype in self.msg_fiter:
             return
         logger.success(f"<m>wechat</m> - <g>收到wechat消息：</g>{escape_tag(str(message))}")
-        if self.loop and self.loop.is_running:
-            if self.ws_message_handler:
-                asyncio.run_coroutine_threadsafe(
-                    self.ws_message_handler(message), self.loop
-                )
-            if self.http_post_handler:
-                asyncio.run_coroutine_threadsafe(
-                    self.http_post_handler(message), self.loop
-                )
+        if self.loop is not None:
+            if self.loop.is_running:
+                if self.ws_message_handler:
+                    asyncio.run_coroutine_threadsafe(
+                        self.ws_message_handler(message), self.loop
+                    )
+                if self.http_post_handler:
+                    asyncio.run_coroutine_threadsafe(
+                        self.http_post_handler(message), self.loop
+                    )
