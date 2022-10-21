@@ -214,6 +214,9 @@ class WeChatManager:
         msgtype = message["type"]
         if msgtype in self.msg_fiter:
             return
+        wx_id = message["data"].get("from_wxid")
+        if wx_id == self.self_id and not self.config.report_self:
+            return
         logger.success(f"<m>wechat</m> - <g>收到wechat消息：</g>{escape_tag(str(message))}")
         if self.loop is not None:
             if self.loop.is_running:
