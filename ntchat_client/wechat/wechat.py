@@ -1,5 +1,7 @@
 import asyncio
+import time
 from asyncio import AbstractEventLoop
+from pathlib import Path
 from typing import Any, Callable, NoReturn, Optional
 
 import ntchat
@@ -17,6 +19,7 @@ from ntchat_client.model import (
 from ntchat_client.utils import escape_tag, notify
 
 from .cache import FileCache
+from .image_decode import FileDecoder
 from .qrcode import draw_qrcode
 
 wechat_client: "WeChatManager" = None
@@ -69,6 +72,10 @@ class WeChatManager:
     """http_post处理器"""
     file_cache: FileCache
     """文件缓存管理器"""
+    image_decoder: FileDecoder
+    """图片解密器"""
+    image_timeout: int
+    """图片下载超时时间"""
     msg_fiter = {
         ntchat.MT_USER_LOGIN_MSG,
         ntchat.MT_USER_LOGOUT_MSG,
@@ -88,6 +95,8 @@ class WeChatManager:
     def __init__(self, config: Config) -> None:
         self.config = config
         self.file_cache = FileCache(config.cache_path)
+        self.image_decoder = FileDecoder(config.image_path)
+        self.image_timeout = config.image_timeout
         self.msg_fiter |= config.msg_filter
         ntchat.set_wechat_exe_path(wechat_version="3.6.0.18")
 
@@ -208,6 +217,23 @@ class WeChatManager:
             echo=echo, status=response.status, msg=response.msg, data=response.data
         )
 
+    def _handle_image(self, message: dict) -> Optional[dict]:
+        """处理图片消息，并替换字段，如果超时将会返回None"""
+        data: dict = message["data"]
+        image_file = Path(data["image"])
+        image_thumb = Path(data["image_thumb"])
+        time_count = 0
+        while True:
+            if image_file.exists() and image_thumb.exists():
+                break
+            time_count += 1
+            if time_count > self.image_timeout:
+                return None
+            time.sleep(1)
+        data["image"] = self.image_decoder.decode_file(image_file, False)
+        data["image_thumb"] = self.image_decoder.decode_file(image_thumb, True)
+        return message
+
     def on_message(self, _: ntchat.WeChat, message: dict) -> None:
         """接收消息"""
         # 过滤事件
@@ -218,6 +244,15 @@ class WeChatManager:
         if wx_id == self.self_id and not self.config.report_self:
             return
         logger.success(f"<m>wechat</m> - <g>收到wechat消息：</g>{escape_tag(str(message))}")
+        if msgtype == 11047:
+            # 群图片消息，预处理
+            logger.debug("正在解密图片地址...")
+            message = self._handle_image(message)
+            if message is None:
+                logger.error("下载图片超时，本次消息不会发送...")
+                return
+            logger.debug("解密图片已保存...")
+
         if self.loop is not None:
             if self.loop.is_running:
                 if self.ws_message_handler:

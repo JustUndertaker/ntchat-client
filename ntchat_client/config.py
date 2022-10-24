@@ -158,6 +158,10 @@ class Config(BaseConfig):
     """文件缓存目录"""
     cache_days: int = 3
     """文件缓存天数"""
+    image_path: str = "./image_decode"
+    """聊天图片解密地址"""
+    image_timeout: int = 30
+    """下载pc图片超时时间(s)，超时的图片消息将不会发送"""
 
     class Config:
         extra = "allow"
