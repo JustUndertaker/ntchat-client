@@ -57,8 +57,20 @@ report_self = False
 # 文件缓存地址
 cache_path = "./file_cache"
 
-# 文件缓存天数
+# 文件缓存天数，为0则不清理缓存
 cache_days = 3
+
+# 聊天图片解密地址
+image_path = "./image_decode"
+
+# 聊天解密图片保存天数，为0则不清理缓存
+image_days = 0
+
+# 下载pc图片超时时间(s)，超时的图片不会解密
+image_timeout = 30
+
+# 超时的图片消息是否继续发送
+timeout_image_send = False
 ```
 
 ## 与Nonebot2通信
