@@ -508,7 +508,7 @@ api地址：/add_room_friend
 | :---------: | :------: | :--: | :----: | :----------: |
 | *room_wxid* |   str    | 必填 |  None  |    房间号    |
 |   *wxid*    |   str    | 必填 |  None  | 请求对方wxid |
-|  *remark*   |   str    | 选填 |  None  |     备注     |
+|  *verify*   |   str    | 选填 |  None  |     备注     |
 
 响应数据类型：None
 
