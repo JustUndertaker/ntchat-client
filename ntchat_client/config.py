@@ -161,7 +161,9 @@ class Config(BaseConfig):
     image_path: str = "./image_decode"
     """聊天图片解密地址"""
     image_timeout: int = 30
-    """下载pc图片超时时间(s)，超时的图片消息将不会发送"""
+    """下载pc图片超时时间(s)，超时的图片不会解密"""
+    timeout_image_send: bool = False
+    """超时的图片消息是否继续发送"""
 
     class Config:
         extra = "allow"

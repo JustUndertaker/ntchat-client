@@ -249,9 +249,13 @@ class WeChatManager:
             logger.debug("正在解密图片地址...")
             message = self._handle_image(message)
             if message is None:
-                logger.error("下载图片超时，本次消息不会发送...")
-                return
-            logger.debug("解密图片已保存...")
+                if self.config.timeout_image_send:
+                    logger.debug("下载图片超时，本次消息原样发送...")
+                else:
+                    logger.error("下载图片超时，本次消息不会发送...")
+                    return
+            else:
+                logger.debug("解密图片已保存...")
 
         if self.loop is not None:
             if self.loop.is_running:
