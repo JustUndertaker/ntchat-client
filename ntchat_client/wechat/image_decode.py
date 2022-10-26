@@ -1,8 +1,12 @@
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
 import numpy as np
+
+from ntchat_client.config import Config
+from ntchat_client.log import logger
 
 
 @dataclass
@@ -69,3 +73,33 @@ class FileDecoder:
             f.write(out_value)
 
         return out_file.absolute()
+
+
+def scheduler_image_job(config: Config) -> None:
+    """定时清理"""
+    path = Path(config.cache_path)
+    days = timedelta(days=config.cache_days)
+    if days == 0:
+        return
+    logger.info("<m>wechat</m> - 开始清理解密图片文件...")
+    now = datetime.now()
+    count = 0
+    delete_count = 0
+    image_path = path / "image"
+    thumb_path = path / "thumb"
+    for file in image_path.iterdir():
+        count += 1
+        file_info = file.stat()
+        file_time = datetime.fromtimestamp(file_info.st_ctime)
+        if now > file_time + days:
+            file.unlink()
+            delete_count += 1
+    for file in thumb_path.iterdir():
+        count += 1
+        file_info = file.stat()
+        file_time = datetime.fromtimestamp(file_info.st_ctime)
+        if now > file_time + days:
+            file.unlink()
+            delete_count += 1
+    logger.debug(f"<m>wechat</m> - 共有解密图片文件 {count} 个，清理 {delete_count} 个...")
+    logger.info("<m>wechat</m> - 解密图片文件清理完毕...")

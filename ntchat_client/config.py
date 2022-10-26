@@ -160,6 +160,8 @@ class Config(BaseConfig):
     """文件缓存天数"""
     image_path: str = "./image_decode"
     """聊天图片解密地址"""
+    image_days: int = 0
+    """聊天图片保存天数，为0则不清理缓存"""
     image_timeout: int = 30
     """下载pc图片超时时间(s)，超时的图片不会解密"""
     timeout_image_send: bool = False

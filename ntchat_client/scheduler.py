@@ -5,6 +5,7 @@ from functools import partial
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from ntchat_client.wechat.cache import scheduler_job
+from ntchat_client.wechat.image_decode import scheduler_image_job
 
 from .config import Config
 from .log import logger
@@ -19,6 +20,9 @@ def scheduler_init(config: Config) -> None:
         scheduler.start()
         scheduler.add_job(
             partial(scheduler_job, config), trigger="cron", hour=0, minute=0
+        )
+        scheduler.add_job(
+            partial(scheduler_image_job, config), trigger="cron", hour=0, minute=0
         )
         logger.success("<m>scheduler</m> - <g>定时器模块已开启...</g>")
 
