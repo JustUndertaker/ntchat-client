@@ -72,7 +72,7 @@ class FileDecoder:
         with open(out_file, mode="wb") as f:
             f.write(out_value)
 
-        return out_file.absolute()
+        return str(out_file.absolute())
 
 
 def scheduler_image_job(config: Config) -> None:
