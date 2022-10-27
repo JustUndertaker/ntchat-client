@@ -9,7 +9,6 @@ from ntchat_client.utils import notify
 from ntchat_client.websocket import websocket_init, websocket_shutdown
 from ntchat_client.wechat import (
     get_wechat_client,
-    scheduler_image_job,
     send_event_loop,
     wechat_init,
     wechat_shutdown,
