@@ -1,7 +1,7 @@
 <h1 align="center">NtChat-Client</h1>
 
 <p align="center">
-	<a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.3.0-blue.svg?" alt="release"></a>
+	<a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.3.1-blue.svg?" alt="release"></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?" alt="License"></a>
 </p>
 
@@ -103,6 +103,14 @@ http_post_url = "http://127.0.0.1:8080/ntchat/http"
 
 <details>
     <summary><h2>更新日志</h2></summary>
+    <h3>
+        0.3.1
+    </h3>
+    <ul>
+        <li>修复部分日志bug</li>
+        <li>增加图片解密及输出</li>
+        <li>增加部分配置，设置缓存文件删除时间</li>
+    </ul>
     <h3>
         0.3.0
     </h3>
