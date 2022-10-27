@@ -27,6 +27,6 @@ async def _(action: str, response: Response, params=Body(None)) -> None:
     res = wechat_client.handle_http_api(http_request)
     response.headers["X-self-ID"] = wechat_client.self_id
     response.headers["access_token"] = wechat_client.config.access_token
-    logger.info(f"<m>http_api</m> - <g>调用返回：</g>{escape_tag(res.dict())}")
+    logger.info(f"<m>http_api</m> - <g>调用返回：</g>{escape_tag(str(res))}")
 
     return res
