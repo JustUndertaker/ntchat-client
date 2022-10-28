@@ -27,20 +27,16 @@ jobs:
             python -m pip install --upgrade pip  &&
             pip install -r requirements.txt &&
             pip install pyinstaller &&
-            pyinstaller -F --name=ntchat-client${{ env.CI_ACTION_REF_NAME }} --collect-data=ntchat --hidden-import dotenv main.py
+            pyinstaller -F --name=ntchat-client-${{ env.CI_ACTION_REF_NAME }} --collect-data=ntchat --hidden-import dotenv main.py
 
-      - name: 打包文件
+      - name: 移动文件
         run: |
-          mv .env ./dist/.env &&
-          cd dist &&
-          tar.exe -a -c -f ntchat-client${{ env.CI_ACTION_REF_NAME }}.zip ntchat-client${{ env.CI_ACTION_REF_NAME }}.exe .env &&
-          rm .env &&
-          rm ntchat-client${{ env.CI_ACTION_REF_NAME }}.exe
+          mv ./dist/ntchat-client-${{ env.CI_ACTION_REF_NAME }}.exe ./ntchat-client-${{ env.CI_ACTION_REF_NAME }}.exe
 
       - name: Git推送
         run: |
           git config --global user.email "806792561@qq.com" &&
           git config --global user.name "${{ env.CI_REPOSITORY_OWNER }}" &&
-          git add . &&
+          git add ./ntchat-client-${{ env.CI_ACTION_REF_NAME }}.exe &&
           git commit -m "auto push build package." &&
           git push --force https://username:${{ secrets.ACCESS_TOKEN }}@github.com/${{ github.repository }}.git main:realse
