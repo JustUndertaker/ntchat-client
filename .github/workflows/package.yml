@@ -26,7 +26,7 @@ jobs:
           architecture: 'x64'
 
       - name: 构建exe
-          run: |
+        run: |
             python -m pip install --upgrade pip  &&
             pip install -r requirements.txt &&
             pip install pyinstaller &&
