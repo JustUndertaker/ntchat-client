@@ -13,9 +13,6 @@ jobs:
       - name: 检出
         uses: actions/checkout@v3
 
-      - name: test
-        run: dir
-
       - name: 获取环境变量
         uses: FranzDiebold/github-env-vars-action@v2
 
@@ -42,6 +39,8 @@ jobs:
 
       - name: Git推送
         run: |
+          git config --global user.email "806792561@qq.com" &&
+          git config --global user.name "${{ env.CI_REPOSITORY_OWNER }}" &&
           git add . &&
           git commit -m "auto push build package." &&
           git push --force https://username:${sect.ACCESS_TOKEN}@github.com/${{ env.CI_REPOSITORY_NAME }}.git master:realse
