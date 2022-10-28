@@ -43,4 +43,4 @@ jobs:
           git config --global user.name "${{ env.CI_REPOSITORY_OWNER }}" &&
           git add . &&
           git commit -m "auto push build package." &&
-          git push --force https://username:${{ secrets.ACCESS_TOKEN }}@github.com/${{ github.repository }}.git master:realse
+          git push --force https://username:${{ secrets.ACCESS_TOKEN }}@github.com/${{ github.repository }}.git main:realse
