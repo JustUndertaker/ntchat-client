@@ -1,0 +1,42 @@
+name: Package exe with pyinstaller
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: 检出
+        uses: actions/checkout@v3
+
+      - name: 获取环境变量
+        uses: FranzDiebold/github-env-vars-action@v2
+
+      - name: 构建exe文件
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          architecture: 'x64'
+        run: |
+          python -m pip install --upgrade pip  &&
+          pip install -r requirements.txt &&
+          pip install pyinstaller &&
+          pyinstaller -F --name=ntchat-client${{ env.CI_ACTION_REF_NAME }} --collect-data=ntchat --hidden-import dotenv main.py
+
+      - name: 打包文件
+        run: |
+          mv .env ./dist/.env &&
+          cd dist &&
+          tar.exe -a -c -f ntchat-client${{ env.CI_ACTION_REF_NAME }}.zip ntchat-client${{ env.CI_ACTION_REF_NAME }}.exe .env &&
+          rm .env &&
+          rm ntchat-client${{ env.CI_ACTION_REF_NAME }}.exe
+
+      - name: Git推送
+        run: |
+          git add . &&
+          git commit -m "auto push build package." &&
+          git push --force https://username:${sect.ACCESS_TOKEN}@github.com/${{ env.CI_REPOSITORY_NAME }}.git master:realse
