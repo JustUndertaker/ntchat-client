@@ -13,14 +13,19 @@ jobs:
       - name: 检出
         uses: actions/checkout@v3
 
+      - name: test
+        run: dir
+
       - name: 获取环境变量
         uses: FranzDiebold/github-env-vars-action@v2
 
-      - name: 构建exe文件
+      - name: 创建python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           architecture: 'x64'
+
+      - name: 构建exe
           run: |
             python -m pip install --upgrade pip  &&
             pip install -r requirements.txt &&
