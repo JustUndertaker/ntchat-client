@@ -2,9 +2,8 @@ name: Package exe with pyinstaller
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+      - 'v*'
 
 jobs:
   build_windows:
@@ -12,9 +11,6 @@ jobs:
     steps:
       - name: 检出
         uses: actions/checkout@v3
-
-      - name: 获取环境变量
-        uses: FranzDiebold/github-env-vars-action@v2
 
       - name: 创建python
         uses: actions/setup-python@v4
@@ -27,16 +23,32 @@ jobs:
             python -m pip install --upgrade pip  &&
             pip install -r requirements.txt &&
             pip install pyinstaller &&
-            pyinstaller -F --name=ntchat-client-${{ env.CI_ACTION_REF_NAME }} --collect-data=ntchat --hidden-import dotenv main.py
+            pyinstaller -F --name=ntchat-client-${{ github.ref }} --collect-data=ntchat --hidden-import dotenv main.py
 
-      - name: 移动文件
+      - name: 打包文件
         run: |
-          mv ./dist/ntchat-client-${{ env.CI_ACTION_REF_NAME }}.exe ./ntchat-client-${{ env.CI_ACTION_REF_NAME }}.exe
+          mv ./dist/ntchat-client-${{ github.ref }}.exe ./ntchat-client-${{ github.ref }}.exe &&
+          zip ntchat-client-${{ github.ref }}.zip ./ntchat-client-${{ github.ref }}.exe ./.env
 
-      - name: Git推送
-        run: |
-          git config --global user.email "806792561@qq.com" &&
-          git config --global user.name "${{ env.CI_REPOSITORY_OWNER }}" &&
-          git add ./ntchat-client-${{ env.CI_ACTION_REF_NAME }}.exe &&
-          git commit -m "auto push build package." &&
-          git push --force https://username:${{ secrets.ACCESS_TOKEN }}@github.com/${{ github.repository }}.git main:realse
+      - name: 发布版本
+        uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: 上传文件
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ntchat-client-${{ github.ref }}.zip
+          asset_name: ntchat-client-${{ github.ref }}.zip
+          asset_content_type: application/zip
+
+
