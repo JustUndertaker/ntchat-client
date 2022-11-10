@@ -12,7 +12,7 @@ jobs:
       - name: 检出
         uses: actions/checkout@v3
 
-      - name: regex
+      - name: 获取tag名
       - uses: actions-ecosystem/action-regex-match@v2
       - id: regex-match
       - with:
