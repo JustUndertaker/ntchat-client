@@ -34,7 +34,7 @@ jobs:
 
       - name: 移动文件
         run: |
-          mv ./dist/ntchat-client-${{ steps.regex-match.outputs.group1 }}.exe ./ntchat-client-${{ steps.regex-match.outputs.group1 }}.exe &&
+          mv ./dist/ntchat-client-${{ steps.regex-match.outputs.group1 }}.exe ./ntchat-client-${{ steps.regex-match.outputs.group1 }}.exe
 
       - name: 打包文件
         uses: vimtor/action-zip@v1
