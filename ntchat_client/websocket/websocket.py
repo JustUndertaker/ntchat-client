@@ -71,6 +71,7 @@ class WsManager:
                     ping_interval=20,
                     ping_timeout=20,
                     close_timeout=10,
+                    max_size=2**25,
                 )
                 asyncio.create_task(self._task())
                 logger.success("<m>websocket</m> - <g>ws已成功连接！</g>")
@@ -99,7 +100,7 @@ class WsManager:
             self.ws_client = None
 
         except ConnectionClosedError as e:
-            logger.error(f"<m>websocket</m> - ws链接异常关闭：<r>{e.reason}</r>")
+            logger.error(f"<m>websocket</m> - ws链接异常关闭：<r>{e.code}</r>")
             # 自启动
             self.ws_client = None
             await self.connect()
