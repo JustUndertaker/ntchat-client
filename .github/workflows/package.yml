@@ -16,8 +16,8 @@ jobs:
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match
         with:
-        text: ${{ github.ref }}
-        regex: 'refs/tags/([\S]+).spec'
+          text: ${{ github.ref }}
+          regex: 'refs/tags/([\S]+).spec'
 
       - name: 创建python
         uses: actions/setup-python@v4
