@@ -32,10 +32,15 @@ jobs:
             pip install pyinstaller &&
             pyinstaller -F --name=ntchat-client-${{ steps.regex-match.outputs.group1 }} --collect-data=ntchat --hidden-import dotenv main.py
 
-      - name: 打包文件
+      - name: 移动文件
         run: |
           mv ./dist/ntchat-client-${{ steps.regex-match.outputs.group1 }}.exe ./ntchat-client-${{ steps.regex-match.outputs.group1 }}.exe &&
-          zip ntchat-client-${{ steps.regex-match.outputs.group1 }}.zip ./ntchat-client-${{ steps.regex-match.outputs.group1 }}.exe ./.env
+
+      - name: 打包文件
+        uses: vimtor/action-zip@v1
+        with:
+          files: ntchat-client-${{ steps.regex-match.outputs.group1 }}.exe .env
+          dest: ntchat-client-${{ steps.regex-match.outputs.group1 }}.zip
 
       - name: 发布版本
         uses: actions/create-release@v1
