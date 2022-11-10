@@ -13,9 +13,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 获取tag名
-      - uses: actions-ecosystem/action-regex-match@v2
-      - id: regex-match
-      - with:
+        uses: actions-ecosystem/action-regex-match@v2
+        id: regex-match
+        with:
         text: ${{ github.ref }}
         regex: 'refs/tags/([\S]+).spec'
 
