@@ -17,7 +17,7 @@ jobs:
         id: regex-match
         with:
           text: ${{ github.ref }}
-          regex: 'refs/tags/([\S]+).spec'
+          regex: 'refs/tags/([\S]+)'
 
       - name: 创建python
         uses: actions/setup-python@v4
