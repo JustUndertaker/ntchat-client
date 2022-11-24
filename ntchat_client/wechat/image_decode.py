@@ -77,7 +77,7 @@ class FileDecoder:
 
 def scheduler_image_job(config: Config) -> None:
     """定时清理"""
-    path = Path(config.cache_path)
+    path = Path(config.image_path)
     days = timedelta(days=config.cache_days)
     if days == 0:
         return
