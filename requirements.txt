@@ -10,7 +10,7 @@ httpx==0.23.0
 idna==3.4
 loguru==0.6.0
 multidict==6.0.2
-ntchat==0.1.16
+ntchat==0.1.19
 pydantic==1.10.2
 numpy==1.23.4
 pyee==9.0.4
