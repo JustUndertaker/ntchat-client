@@ -1,7 +1,7 @@
 <h1 align="center">NtChat-Client</h1>
 
 <p align="center">
-	<a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.3.1-blue.svg?" alt="release"></a>
+	<a href="https://github.com/JustUndertaker/ntchat-client/releases"><img src="https://img.shields.io/badge/release-0.3.2-blue.svg?" alt="release"></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?" alt="License"></a>
 </p>
 
@@ -104,6 +104,13 @@ http_post_url = "http://127.0.0.1:8080/ntchat/http"
 <details>
     <summary><h2>更新日志</h2></summary>
     <h3>
+        0.3.2
+    </h3>
+    <ul>
+        <li>修复图片缓存清除bug</li>
+        <li>升级上游依赖版本</li>
+    </ul>
+    <h3>
         0.3.1
     </h3>
     <ul>
@@ -137,6 +144,7 @@ http_post_url = "http://127.0.0.1:8080/ntchat/http"
         </ul>
     </ul>
 </details>
+
 
 ## Http api
 
@@ -557,3 +565,14 @@ api地址：/modify_friend_remark
 
 响应数据类型：None
 
+### 获取群名
+
+api地址：/get_room_name
+
+参数:
+
+|   字段名    | 数据类型 | 可选 | 默认值 |  说明  |
+| :---------: | :------: | :--: | :----: | :----: |
+| *room_wxid* |   str    | 必填 |  None  | 房间号 |
+
+响应数据类型：str
