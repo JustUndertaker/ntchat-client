@@ -83,7 +83,7 @@ timeout_image_send = False
 
 ```dotenv
 # ws主动连接地址，不填不会主动连接ws
-ws_address = "127.0.0.1:8080/ntchat/ws"
+ws_address = "ws://127.0.0.1:8080/ntchat/ws"
 ```
 
 - 这里127.0.0.1与nb2的host配置对应
