@@ -5,6 +5,11 @@
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?" alt="License"></a>
 </p>
 
+## 新的开始
+这边已经不再维护，但可继续使用。
+
+可以关注新坑：[ComWeChatBotClient](https://github.com/JustUndertaker/ComWeChatBotClient) ，使用onebot12协议，更方便做一些操作。
+
 ## 介绍
 
 - ntchat的封装无头客户端，配合 [ntchat-adapter](https://github.com/JustUndertaker/adapter-ntchat) 实现和Nonebot2通信
